@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\RefInstansiModel;
 use App\Models\RefPekerjaanModel;
 use App\Models\RefPendidikanModel;
+use App\Models\RefPertanyaanModel;
+use App\Models\RefJawabanModel;
+use App\Models\RefJenisLayananModel;
 
 class Survey extends BaseController
 {
@@ -15,26 +18,62 @@ class Survey extends BaseController
             return redirect()->to('/');
         }
 
-        // Format the slug to a readable title (e.g., "sistem-informasi" -> "Sistem Informasi")
-        $unitName = ucwords(str_replace('-', ' ', $slug));
-
-        $unitMap = [
-            'sidigi' => 'Sistem Informasi dan Digitalisasi',
-            'mutasi' => 'Pengangkatan dan Mutasi',
-            'status' => 'Status dan Pemberhentian',
-            'manajemen' => 'Pembinaan Manajemen ASN',
-            'pengawasan' => 'Pengawasan dan Pengendalian',
-            'narasumber' => 'Narasumber',
+        // 1. Map Slug to Kode Layanan
+        // You can add other mappings here as needed
+        $slugToKodeMap = [
+            'sidigi'     => 'KL001',
+            'mutasi'     => 'KL002',
+            'status'     => 'KL003',
+            'manajemen'  => 'KL004',
+            'pengawasan' => 'KL005',
+            'narasumber' => 'KL006',
         ];
 
-        if (array_key_exists($slug, $unitMap)) {
-            $unitName = $unitMap[$slug];
+        $kodeLayanan = $slugToKodeMap[$slug] ?? null;
+
+        if (!$kodeLayanan) {
+            return redirect()->to('/')->with('error', 'Unit layanan tidak ditemukan.');
         }
 
         // Load models
         $pendidikanModel = new RefPendidikanModel();
         $instansiModel = new RefInstansiModel();
         $pekerjaanModel = new RefPekerjaanModel();
+        $pertanyaanModel = new RefPertanyaanModel();
+        $jawabanModel = new RefJawabanModel();
+        $jenisLayananModel = new RefJenisLayananModel();
+
+        // 2. Get Layanan Data from DB
+        $layanan = $jenisLayananModel->where('kode_layanan', $kodeLayanan)->first();
+
+        if (!$layanan) {
+            return redirect()->to('/')->with('error', 'Data layanan belum tersedia.');
+        }
+
+        $unitName = $layanan->nama_layanan;
+
+        // 3. Fetch questions based on jenis_layanan_id
+        $questions = $pertanyaanModel->where('jenis_layanan_id', $layanan->id)
+            ->where('is_active', 1)
+            ->orderBy('id', 'ASC')
+            ->findAll();
+
+        // 4. Fetch options for these questions
+        $questionIds = array_column($questions, 'id');
+        $optionsMap = [];
+
+        if (!empty($questionIds)) {
+            // Note: Using 'soal_id' and 'bobot_nilai' based on your RefJawabanModel
+            $options = $jawabanModel->whereIn('soal_id', $questionIds)->orderBy('bobot_nilai', 'ASC')->findAll();
+            foreach ($options as $opt) {
+                $optionsMap[$opt->soal_id][] = $opt;
+            }
+        }
+
+        // 3. Attach options to each question object
+        foreach ($questions as $q) {
+            $q->options = $optionsMap[$q->id] ?? [];
+        }
 
         $data = [
             'slug' => $slug,
@@ -42,18 +81,7 @@ class Survey extends BaseController
             'unit_name' => $unitName,
             'pendidikan' => $pendidikanModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll(),
             'pekerjaan' => $pekerjaanModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll(),
-            'questions' => [
-                "Bagaimana kesesuaian persyaratan pelayanan dengan jenis pelayanannya?",
-                "Bagaimana kemudahan prosedur pelayanan di unit ini?",
-                "Bagaimana kecepatan waktu dalam memberikan pelayanan?",
-                "Bagaimana kewajaran biaya/tarif dalam pelayanan?",
-                "Bagaimana kesesuaian produk pelayanan antara yang tercantum dalam standar pelayanan dengan hasil yang diberikan?",
-                "Bagaimana kompetensi/kemampuan petugas dalam memberikan pelayanan?",
-                "Bagaimana perilaku petugas dalam memberikan pelayanan terkait kesopanan dan keramahan?",
-                "Bagaimana kualitas sarana dan prasarana pendukung pelayanan?",
-                "Bagaimana penanganan pengaduan saran dan masukan?",
-                "Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelayanan ini?"
-            ]
+            'questions' => $questions
         ];
 
         return view('survey/form', $data);

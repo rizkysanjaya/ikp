@@ -20,7 +20,7 @@
     <nav class="bg-[#0e4c92] shadow-lg border-b-4 border-yellow-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
-                <div class="flex-shrink-0 flex items-center space-x-4">
+                <a href="<?= base_url('/') ?>" class="flex-shrink-0 flex items-center space-x-4">
                     <!-- Icon/Logo Placeholder -->
                     <div class="bg-white p-2 rounded-full shadow-sm">
                         <svg class="w-8 h-8 text-[#0e4c92]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -31,7 +31,7 @@
                         <span class="font-bold text-xl text-white leading-tight">IKP Online</span>
                         <span class="text-xs text-[#fdb913] font-medium tracking-wide">BKN KANREG III BANDUNG</span>
                     </div>
-                </div>
+                </a>
                 <div>
                     <a href="#" class="text-white hover:text-blue-200 text-sm font-medium">Login Admin</a>
                 </div>

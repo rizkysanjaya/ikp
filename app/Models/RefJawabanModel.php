@@ -6,8 +6,8 @@ use CodeIgniter\Model;
 
 class RefJawabanModel extends Model
 {
-    protected $table            = 'ref_jawaban';
+    protected $table            = 'ref_opsi_jawaban';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['pertanyaan_id', 'jawaban', 'nilai'];
+    protected $allowedFields    = ['soal_id', 'label_jawaban', 'bobot_nilai'];
     protected $returnType       = 'object';
 }

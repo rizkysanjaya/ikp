@@ -7,5 +7,9 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-$routes->get('survey/(:segment)', 'Survey::index/$1');
+// Specific routes must come BEFORE the generic (:segment) route
+$routes->get('survey/getInstansi', 'Survey::getInstansi');
 $routes->post('survey/submit', 'Survey::submit');
+
+// Generic route for unit slugs (e.g., survey/sidigi)
+$routes->get('survey/(:segment)', 'Survey::index/$1');

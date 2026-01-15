@@ -2,22 +2,46 @@
 
 namespace App\Controllers;
 
+use App\Models\RefInstansiModel;
+use App\Models\RefPekerjaanModel;
+use App\Models\RefPendidikanModel;
+
 class Survey extends BaseController
 {
     public function index($slug = null)
     {
-        if ($slug === null) {
+        // If slug is 'index' (default) or null, redirect home
+        if ($slug === null || $slug === 'index') {
             return redirect()->to('/');
         }
 
         // Format the slug to a readable title (e.g., "sistem-informasi" -> "Sistem Informasi")
         $unitName = ucwords(str_replace('-', ' ', $slug));
 
+        $unitMap = [
+            'sidigi' => 'Sistem Informasi dan Digitalisasi',
+            'mutasi' => 'Pengangkatan dan Mutasi',
+            'status' => 'Status dan Pemberhentian',
+            'manajemen' => 'Pembinaan Manajemen ASN',
+            'pengawasan' => 'Pengawasan dan Pengendalian',
+            'narasumber' => 'Narasumber',
+        ];
+
+        if (array_key_exists($slug, $unitMap)) {
+            $unitName = $unitMap[$slug];
+        }
+
+        // Load models
+        $pendidikanModel = new RefPendidikanModel();
+        $instansiModel = new RefInstansiModel();
+        $pekerjaanModel = new RefPekerjaanModel();
+
         $data = [
             'slug' => $slug,
             'title' => 'Survei Kepuasan - ' . $unitName,
             'unit_name' => $unitName,
-            // These questions will eventually come from the database based on $slug
+            'pendidikan' => $pendidikanModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll(),
+            'pekerjaan' => $pekerjaanModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll(),
             'questions' => [
                 "Bagaimana kesesuaian persyaratan pelayanan dengan jenis pelayanannya?",
                 "Bagaimana kemudahan prosedur pelayanan di unit ini?",
@@ -33,6 +57,31 @@ class Survey extends BaseController
         ];
 
         return view('survey/form', $data);
+    }
+
+    public function getInstansi()
+    {
+        $instansiModel = new RefInstansiModel();
+        $searchTerm = $this->request->getVar('searchTerm');
+
+        if ($searchTerm) {
+            $instansi = $instansiModel->like('nama_instansi', $searchTerm)
+                ->where('is_active', 1)
+                ->findAll(100);
+        } else {
+            $instansi = $instansiModel->where('is_active', 1)
+                ->findAll(100);
+        }
+
+        $data = [];
+        foreach ($instansi as $row) {
+            $data[] = [
+                'id'   => $row->id,
+                'text' => $row->nama_instansi,
+            ];
+        }
+
+        return $this->response->setJSON($data);
     }
 
     public function submit()

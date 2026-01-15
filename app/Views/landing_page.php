@@ -43,7 +43,7 @@
 
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <!-- Unit 1 -->
-        <a href="<?= base_url('survey/sistem-informasi') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
+        <a href="<?= base_url('survey/sidigi') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
             <div class="h-2 bg-blue-500 group-hover:bg-blue-600 transition-colors"></div>
             <div class="p-6">
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -71,7 +71,7 @@
         </a>
 
         <!-- Unit 3 -->
-        <a href="<?= base_url('survey/status-pemberhentian') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
+        <a href="<?= base_url('survey/status') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
             <div class="h-2 bg-yellow-500 group-hover:bg-yellow-600 transition-colors"></div>
             <div class="p-6">
                 <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white transition-colors">
@@ -85,7 +85,7 @@
         </a>
 
         <!-- Unit 4 -->
-        <a href="<?= base_url('survey/pembinaan') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
+        <a href="<?= base_url('survey/manajemen') ?>" class="group block bg-white rounded-md shadow hover:shadow-lg border border-gray-200 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
             <div class="h-2 bg-purple-500 group-hover:bg-purple-600 transition-colors"></div>
             <div class="p-6">
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">

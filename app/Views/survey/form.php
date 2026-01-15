@@ -67,7 +67,7 @@
 
                 <!-- Intro Section -->
                 <div class="bg-blue-50 border-l-4 border-[#0e4c92] rounded-r-lg p-5 mb-8 text-sm text-blue-900 text-left shadow-sm">
-                    <p class="mb-2">Mohon berkenan Bapak/Ibu penerima layanan kepegawaian <strong>Kantor Regional III BKN Bandung</strong> untuk dapat mengisi survei <strong>Indeks Kepuasan Masyarakat (IKM) Layanan Kepegawaian</strong> ini. Kami harap Bapak/Ibu dapat memberikan tanggapan terbaik atas pelayanan yang telah diterima. Hasil dari survei ini akan menjadi dasar evaluasi kami.</p>
+                    <p class="mb-2">Mohon berkenan Bapak/Ibu penerima layanan kepegawaian <strong>Kantor Regional III BKN Bandung</strong> untuk dapat mengisi survei <strong>Indeks Kepuasan Pelayanan (IKP)</strong> ini. Kami harap Bapak/Ibu dapat memberikan tanggapan terbaik atas pelayanan yang telah diterima. Hasil dari survei ini akan menjadi dasar evaluasi kami.</p>
                     <p class="font-bold">Form bertanda bintang (*) wajib diisi.</p>
                 </div>
 

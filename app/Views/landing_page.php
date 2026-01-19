@@ -188,6 +188,51 @@
         </a>
     </div>
 </div>
+<div class="bg-gray-50 py-16 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Statistik Responden</h2>
+            <div class="w-24 h-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 mx-auto rounded-full"></div>
+            <p class="mt-4 text-gray-600">Demografi masyarakat yang telah berpartisipasi dalam survei kami.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+                    Partisipasi Berdasarkan Gender
+                </h3>
+                <div id="genderChart" class="flex justify-center"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-green-500 rounded-full mr-3"></span>
+                    Kelompok Usia Responden
+                </h3>
+                <div id="usiaChart"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-purple-500 rounded-full mr-3"></span>
+                    Latar Belakang Pekerjaan
+                </h3>
+                <div id="pekerjaanChart"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-2 h-8 bg-orange-500 rounded-full mr-3"></span>
+                    Tingkat Pendidikan
+                </h3>
+                <div id="pendidikanChart"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -202,6 +247,167 @@
             slides[currentSlide].classList.remove('opacity-0');
             slides[currentSlide].classList.add('opacity-100');
         }, 4000);
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+    // 1. Ambil Data dari PHP Controller
+    const rawGender = <?= $chartGender ?>;
+    const rawPendidikan = <?= $chartPendidikan ?>;
+    const rawPekerjaan = <?= $chartPekerjaan ?>;
+    const rawUsia = <?= $chartUsia ?>;
+
+    // --- Helper Functions ---
+    const getLabels = (data, key) => data.map(item => item[key]);
+    const getValues = (data, key) => data.map(item => parseInt(item[key]));
+
+    // --- CHART 1: GENDER (Donut) ---
+    const genderOptions = {
+        series: getValues(rawGender, 'total'),
+        labels: rawGender.map(item => item.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'),
+        chart: {
+            type: 'donut',
+            height: 320,
+            fontFamily: 'Inherit'
+        },
+        colors: ['#3b82f6', '#ec4899'], // Biru & Pink
+        legend: {
+            position: 'bottom'
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '65%'
+                }
+            }
+        },
+        dataLabels: {
+            enabled: true
+        },
+        tooltip: {
+            y: {
+                formatter: val => val + " Orang"
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#genderChart"), genderOptions).render();
+
+    // --- CHART 2: USIA (Column) ---
+    const usiaOptions = {
+        series: [{
+            name: 'Jumlah',
+            data: getValues(rawUsia, 'total')
+        }],
+        chart: {
+            type: 'bar',
+            height: 320,
+            fontFamily: 'Inherit',
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#10b981'], // Hijau
+        plotOptions: {
+            bar: {
+                borderRadius: 6,
+                columnWidth: '50%',
+                distributed: true
+            }
+        },
+        xaxis: {
+            categories: getLabels(rawUsia, 'kelompok_usia')
+        },
+        legend: {
+            show: false
+        },
+        tooltip: {
+            y: {
+                formatter: val => val + " Orang"
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#usiaChart"), usiaOptions).render();
+
+    // --- CHART 3: PEKERJAAN (Bar Horizontal) ---
+    const pekerjaanOptions = {
+        series: [{
+            name: 'Jumlah',
+            data: getValues(rawPekerjaan, 'total')
+        }],
+        chart: {
+            type: 'bar',
+            height: 320,
+            fontFamily: 'Inherit',
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#8b5cf6'], // Ungu
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: true,
+                barHeight: '60%'
+            }
+        },
+        xaxis: {
+            categories: getLabels(rawPekerjaan, 'nama_pekerjaan')
+        },
+        tooltip: {
+            y: {
+                formatter: val => val + " Orang"
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#pekerjaanChart"), pekerjaanOptions).render();
+
+    // --- CHART 4: PENDIDIKAN (Bar Horizontal) ---
+    const pendidikanOptions = {
+        series: [{
+            name: 'Jumlah',
+            data: getValues(rawPendidikan, 'total')
+        }],
+        chart: {
+            type: 'bar',
+            height: 320,
+            fontFamily: 'Inherit',
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#f97316'], // Orange
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: true,
+                barHeight: '60%'
+            }
+        },
+        xaxis: {
+            categories: getLabels(rawPendidikan, 'nama_pendidikan')
+        },
+        tooltip: {
+            y: {
+                formatter: val => val + " Orang"
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#pendidikanChart"), pendidikanOptions).render();
+
+    // --- Carousel Script Lama Anda ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        if (slides.length > 0) {
+            let currentSlide = 0;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('opacity-100');
+                slides[currentSlide].classList.add('opacity-0');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.remove('opacity-0');
+                slides[currentSlide].classList.add('opacity-100');
+            }, 4000);
+        }
     });
 </script>
 <?= $this->endSection() ?>

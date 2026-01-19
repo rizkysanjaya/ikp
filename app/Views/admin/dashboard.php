@@ -2,194 +2,151 @@
 
 <?= $this->section('content') ?>
 <div class="max-w-7xl mx-auto">
-    <!-- Welcome Card -->
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-[#0e4c92] mb-8">
-        <div class="p-8 bg-white border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
-                    <p class="mt-2 text-gray-600">Selamat datang kembali, <span class="font-bold text-[#0e4c92]"><?= esc($username) ?></span>!</p>
-                </div>
-                <div class="bg-blue-50 p-3 rounded-full">
-                    <svg class="w-8 h-8 text-[#0e4c92]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-transparent rounded-full -mr-16 -mt-16 opacity-60 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                <p class="mt-1 text-gray-600">Selamat datang kembali, <span class="font-bold text-[#0e4c92]"><?= esc($username) ?></span>!</p>
+            </div>
+            <div class="hidden sm:block">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                </div>
+                    <?= date('d F Y') ?>
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Stats Grid (Placeholder) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Stat 1 -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-            <div class="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Survei</div>
-            <div class="mt-2 text-3xl font-bold text-gray-900">0</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+            <div class="p-4 rounded-full bg-blue-50 text-blue-600 mr-5">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Total Survei Masuk</p>
+                <p class="text-3xl font-bold text-gray-900"><?= number_format($totalSurvei) ?></p>
+            </div>
         </div>
-        <!-- Stat 2 -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-            <div class="text-gray-500 text-xs font-bold uppercase tracking-wider">Unit Layanan</div>
-            <div class="mt-2 text-3xl font-bold text-gray-900">6</div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+            <div class="p-4 rounded-full bg-green-50 text-green-600 mr-5">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Unit Layanan Aktif</p>
+                <p class="text-3xl font-bold text-gray-900"><?= number_format($totalUnit) ?></p>
+            </div>
         </div>
-        <!-- Stat 3 -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-            <div class="text-gray-500 text-xs font-bold uppercase tracking-wider">Responden Hari Ini</div>
-            <div class="mt-2 text-3xl font-bold text-gray-900">0</div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+            <div class="p-4 rounded-full bg-orange-50 text-orange-600 mr-5">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Responden Hari Ini</p>
+                <p class="text-3xl font-bold text-gray-900"><?= number_format($todaySurvei) ?></p>
+            </div>
         </div>
     </div>
 
-    <!-- Unit Performance Grid -->
-    <h2 class="text-xl font-bold text-gray-800 mt-8 mb-4">Rekapitulasi Nilai IKP Per Unit</h2>
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 mt-12 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Performa Unit Layanan</h2>
+            <p class="text-gray-500 mt-1">Pantauan real-time indeks kepuasan per unit kerja</p>
+        </div>
+        <div class="flex gap-3 text-sm text-gray-500 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 self-start md:self-auto">
+            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>A</div>
+            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span>B</div>
+            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>C</div>
+            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>D</div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Unit 1: Sistem Informasi -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Sistem Informasi</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">88.50</span>
-                        <span class="ml-2 text-sm font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Mutu A</span>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Sangat Baik</p>
-                </div>
-                <div class="p-2 bg-blue-50 rounded-lg">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                120 Responden
-            </div>
-        </div>
+        <?php foreach ($unitData as $unit): ?>
+            <?php
+            // Logika Warna Dinamis
+            $colorClass = match ($unit['mutu']) {
+                'A' => 'emerald',
+                'B' => 'blue',
+                'C' => 'yellow',
+                'D' => 'red',
+                default => 'gray',
+            };
+            ?>
 
-        <!-- Unit 2: Pengangkatan & Mutasi -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Pengangkatan & Mutasi</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">82.10</span>
-                        <span class="ml-2 text-sm font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Mutu B</span>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Baik</p>
-                </div>
-                <div class="p-2 bg-green-50 rounded-lg">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                95 Responden
-            </div>
-        </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group h-full flex flex-col">
 
-        <!-- Unit 3: Status & Pemberhentian -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Status & Pemberhentian</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">90.00</span>
-                        <span class="ml-2 text-sm font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Mutu A</span>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Sangat Baik</p>
-                </div>
-                <div class="p-2 bg-yellow-50 rounded-lg">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                150 Responden
-            </div>
-        </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-<?= $colorClass ?>-500"></div>
 
-        <!-- Unit 4: Manajemen ASN -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Manajemen ASN</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">78.50</span>
-                        <span class="ml-2 text-sm font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Mutu B</span>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Baik</p>
-                </div>
-                <div class="p-2 bg-purple-50 rounded-lg">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                60 Responden
-            </div>
-        </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="flex justify-between items-start mb-4 pl-2">
+                        <div class="flex-1 pr-4">
+                            <div class="h-20 flex items-start overflow-hidden">
+                                <h3 class="text-lg font-bold text-gray-800 leading-snug group-hover:text-<?= $colorClass ?>-600 transition-colors line-clamp-3">
+                                    <?= esc($unit['nama_layanan']) ?>
+                                </h3>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2 uppercase tracking-wider font-semibold">Unit Pelayanan</p>
+                        </div>
 
-        <!-- Unit 5: Pengawasan -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Pengawasan</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">85.00</span>
-                        <span class="ml-2 text-sm font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Mutu B</span>
+                        <div class="w-10 h-10 rounded-full bg-<?= $colorClass ?>-50 flex items-center justify-center text-<?= $colorClass ?>-600 shadow-sm flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">Baik</p>
-                </div>
-                <div class="p-2 bg-red-50 rounded-lg">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                45 Responden
-            </div>
-        </div>
 
-        <!-- Unit 6: Narasumber -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-semibold text-gray-700">Narasumber</h3>
-                    <div class="mt-4 flex items-baseline">
-                        <span class="text-3xl font-bold text-gray-900">92.00</span>
-                        <span class="ml-2 text-sm font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Mutu A</span>
+                    <div class="mt-auto pl-2">
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 mb-1">Nilai IKM</p>
+                                <div class="flex items-baseline">
+                                    <span class="text-5xl font-black text-gray-900 tracking-tight">
+                                        <?= esc($unit['ikm_score']) ?>
+                                    </span>
+                                    <span class="text-sm text-gray-400 font-medium ml-1 mb-2">/100</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 rounded-2xl bg-<?= $colorClass ?>-500 text-white flex items-center justify-center shadow-lg shadow-<?= $colorClass ?>-200 transform group-hover:scale-110 transition-transform duration-300">
+                                    <span class="text-3xl font-bold"><?= esc($unit['mutu']) ?></span>
+                                </div>
+                                <span class="text-xs font-bold text-<?= $colorClass ?>-600 mt-2 uppercase"><?= esc($unit['ket']) ?></span>
+                            </div>
+                        </div>
+
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">Sangat Baik</p>
                 </div>
-                <div class="p-2 bg-orange-50 rounded-lg">
-                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                    </svg>
+
+                <div class="bg-gray-50/80 px-6 py-3 border-t border-gray-100 flex items-center justify-between text-sm pl-8">
+                    <div class="flex items-center text-gray-500">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <span class="font-bold text-gray-700 mr-1"><?= number_format($unit['total_responden']) ?></span> Responden
+                    </div>
+                    <a href="#" class="text-<?= $colorClass ?>-600 hover:text-<?= $colorClass ?>-700 font-medium text-xs flex items-center transition-colors">
+                        Detail
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
                 </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                30 Responden
-            </div>
-        </div>
+        <?php endforeach; ?>
     </div>
+
 </div>
 <?= $this->endSection() ?>

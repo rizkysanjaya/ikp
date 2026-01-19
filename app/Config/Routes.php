@@ -11,6 +11,7 @@ $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::attemptLogin');
 $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Dashboard::index');
+$routes->get('dashboard/getUpdates', 'Dashboard::getUpdates');
 
 // Specific routes must come BEFORE the generic (:segment) route
 $routes->get('survey/getInstansi', 'Survey::getInstansi');

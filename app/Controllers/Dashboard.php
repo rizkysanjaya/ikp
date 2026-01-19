@@ -139,4 +139,85 @@ class Dashboard extends BaseController
 
         return view('admin/dashboard', $data);
     }
+
+    // Tambahkan method ini di dalam Class Dashboard
+    public function getUpdates()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setStatusCode(401);
+        }
+
+        $db = \Config\Database::connect();
+
+        // 1. Hitung Ulang Stats
+        $totalSurvei = $db->table('trans_responden')->countAll();
+        $totalUnit   = $db->table('ref_jenis_layanan')->where('is_active', 1)->countAllResults();
+        $todaySurvei = $db->table('trans_responden')
+            ->where('DATE(tanggal_survei)', date('Y-m-d'))
+            ->countAllResults();
+
+        // 2. Hitung Ulang Unit Data (Copy logic dari index, atau extract ke private method)
+        // Agar ringkas, saya asumsikan logic perhitungan sama persis dengan index()
+        // ... (MASUKKAN LOGIKA PERHITUNGAN IKM DI SINI SEPERTI DI FUNCTION INDEX) ...
+
+        // --- MULAI COPY LOGIC PERHITUNGAN DARI INDEX() ---
+        $units = $db->table('ref_jenis_layanan')->where('is_active', 1)->get()->getResult();
+        $unitData = [];
+        foreach ($units as $unit) {
+            $respondenQuery = $db->table('trans_responden')->select('id')->where('jenis_layanan_id', $unit->id)->get();
+            $respondenIds = array_column($respondenQuery->getResultArray(), 'id');
+            $totalResponden = count($respondenIds);
+
+            $ikmScore = 0;
+            $mutu = '-';
+            $ket = 'Belum ada data';
+
+            if ($totalResponden > 0) {
+                $unsurAvgs = $db->table('trans_detail_jawaban')
+                    ->select('ref_soal.unsur_id, AVG(trans_detail_jawaban.nilai_skor) as avg_skor')
+                    ->join('ref_soal', 'ref_soal.id = trans_detail_jawaban.soal_id')
+                    ->whereIn('trans_detail_jawaban.responden_id', $respondenIds)
+                    ->groupBy('ref_soal.unsur_id')
+                    ->get()->getResult();
+
+                $sumAvg = 0;
+                foreach ($unsurAvgs as $row) $sumAvg += $row->avg_skor;
+                $ikmScore = ($sumAvg / 9) * 25; // Fixed divisor 9
+
+                if ($ikmScore >= 88.31) {
+                    $mutu = 'A';
+                    $ket = 'Sangat Baik';
+                } elseif ($ikmScore >= 76.61) {
+                    $mutu = 'B';
+                    $ket = 'Baik';
+                } elseif ($ikmScore >= 65.00) {
+                    $mutu = 'C';
+                    $ket = 'Kurang Baik';
+                } else {
+                    $mutu = 'D';
+                    $ket = 'Tidak Baik';
+                }
+            }
+
+            $unitData[] = [
+                'nama_layanan' => $unit->nama_layanan,
+                'total_responden' => $totalResponden,
+                'ikm_score' => number_format($ikmScore, 2),
+                'mutu' => $mutu,
+                'ket' => $ket,
+            ];
+        }
+        // --- SELESAI COPY LOGIC ---
+
+        // 3. Render Partial View menjadi HTML String
+        $htmlUnits = view('admin/partials/unit_cards', ['unitData' => $unitData]);
+
+        // 4. Return JSON
+        return $this->response->setJSON([
+            'totalSurvei' => number_format($totalSurvei),
+            'totalUnit'   => number_format($totalUnit),
+            'todaySurvei' => number_format($todaySurvei),
+            'htmlUnits'   => $htmlUnits
+        ]);
+    }
 }

@@ -8,6 +8,8 @@ use App\Models\RefPendidikanModel;
 use App\Models\RefPertanyaanModel;
 use App\Models\RefJawabanModel;
 use App\Models\RefJenisLayananModel;
+use App\Models\SurveyRespondenModel;
+use App\Models\SurveyJawabanModel;
 
 class Survey extends BaseController
 {
@@ -114,9 +116,80 @@ class Survey extends BaseController
 
     public function submit()
     {
-        // Logic to save to database will go here
-        // $data = $this->request->getPost();
+        // 1. Validasi Input
+        if (!$this->validate([
+            'nama'          => 'required',
+            'jenis_kelamin' => 'required',
+            'umur'          => 'required|numeric',
+            'pendidikan'    => 'required',
+            'pekerjaan'     => 'required',
+            'instansi'      => 'required',
+            'unit_slug'     => 'required',
+            'jawaban'       => 'required',
+        ])) {
+            return redirect()->back()->withInput()->with('error', 'Mohon lengkapi semua isian wajib.');
+        }
 
-        return redirect()->to('/')->with('message', 'Terima kasih, survei Anda telah berhasil dikirim.');
+        // 2. Ambil Data Layanan (untuk mendapatkan ID Layanan)
+        $slug = $this->request->getPost('unit_slug');
+        $slugToKodeMap = [
+            'sidigi'     => 'KL001',
+            'mutasi' => 'KL002',
+            'status' => 'KL003',
+            'manajemen'  => 'KL004',
+            'pengawasan' => 'KL005',
+            'narasumber' => 'KL006',
+        ];
+        $kodeLayanan = $slugToKodeMap[$slug] ?? null;
+
+        $jenisLayananModel = new RefJenisLayananModel();
+        $layanan = $jenisLayananModel->where('kode_layanan', $kodeLayanan)->first();
+
+        if (!$layanan) {
+            return redirect()->back()->with('error', 'Unit layanan tidak valid.');
+        }
+
+        // 3. Simpan Data Responden
+        $respondenModel = new SurveyRespondenModel();
+        $dataResponden = [
+            'nama_lengkap'     => $this->request->getPost('nama'),
+            'jenis_kelamin'    => $this->request->getPost('jenis_kelamin'),
+            'umur'             => $this->request->getPost('umur'),
+            'pendidikan_id'    => $this->request->getPost('pendidikan'),
+            'pekerjaan_id'     => $this->request->getPost('pekerjaan'),
+            'instansi_id'      => $this->request->getPost('instansi'),
+            'jenis_layanan_id' => $layanan->id,
+            'saran_masukan'    => $this->request->getPost('saran_masukan'),
+            'tanggal_survei'   => date('Y-m-d H:i:s')
+        ];
+
+        $respondenModel->insert($dataResponden);
+        $respondenId = $respondenModel->getInsertID();
+
+        // 4. Simpan Jawaban Survei
+        $jawabanModel = new SurveyJawabanModel();
+        $refJawabanModel = new RefJawabanModel();
+
+        $jawaban = $this->request->getPost('jawaban'); // Array [soal_id => opsi_jawaban_id]
+        $dataJawaban = [];
+
+        if (is_array($jawaban)) {
+            foreach ($jawaban as $soalId => $opsiId) {
+                // Lookup score based on option ID
+                $opsi = $refJawabanModel->find($opsiId);
+                if ($opsi) {
+                    $dataJawaban[] = [
+                        'responden_id'    => $respondenId,
+                        'soal_id'         => $soalId,
+                        'opsi_jawaban_id' => $opsiId,
+                        'nilai_skor'      => $opsi->bobot_nilai
+                    ];
+                }
+            }
+            if (!empty($dataJawaban)) $jawabanModel->insertBatch($dataJawaban);
+        }
+
+        // 5. Tampilkan Halaman Sukses
+        return view('survey/success');
     }
 }

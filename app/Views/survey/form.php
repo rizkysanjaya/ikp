@@ -57,7 +57,7 @@
 </style>
 
 <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border-t-8 border-[#de1d5e]">
+    <div class="bg-white shadow-2xl rounded-2xl border-t-8 border-[#de1d5e]">
         <div class="px-6 py-8">
 
             <!-- Header & Progress -->
@@ -117,8 +117,8 @@
 
                         <!-- Usia -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Usia (Tahun) <span class="text-red-500">*</span></label>
-                            <input type="number" name="usia" required min="17" max="100" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-all duration-200 shadow-sm" placeholder="Contoh: 25">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Umur (Tahun) <span class="text-red-500">*</span></label>
+                            <input type="number" name="umur" required min="17" max="100" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-all duration-200 shadow-sm" placeholder="Contoh: 25">
                         </div>
                     </div>
 
@@ -164,6 +164,23 @@
                 <div id="step2" class="hidden space-y-8 animate-fade-in">
                     <h2 class="text-xl font-semibold text-gray-700 border-b pb-2">Bagian 2: Penilaian Unit</h2>
 
+                    <!-- Sticky Progress Header -->
+                    <div class="sticky top-20 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-200 -mx-6 px-6 py-4 mb-6 shadow-sm transition-all duration-300">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm sm:text-base">Kuesioner Pelayanan</h3>
+                                <p class="text-xs text-gray-500">Mohon isi sesuai pengalaman nyata Anda.</p>
+                            </div>
+                            <div class="text-right">
+                                <span id="progress-count" class="text-xl font-bold text-[#0e4c92]">0</span>
+                                <span class="text-gray-500 text-xs sm:text-sm font-medium">/ <?= count($questions) ?> Terisi</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mt-3 overflow-hidden">
+                            <div id="progress-bar" class="bg-[#0e4c92] h-1.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+
                     <?php if (empty($questions)): ?>
                         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                             <div class="flex">
@@ -187,7 +204,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                                     <?php foreach ($q->options as $opt): ?>
                                         <label class="cursor-pointer relative group">
-                                            <input type="radio" name="jawaban[<?= $q->id ?>]" value="<?= esc($opt->bobot_nilai) ?>" class="peer sr-only survey-radio">
+                                            <input type="radio" name="jawaban[<?= $q->id ?>]" value="<?= esc($opt->id) ?>" class="peer sr-only survey-radio">
                                             <div class="h-full p-3 rounded-lg border border-gray-200 bg-gray-50 hover:bg-white hover:border-blue-300 peer-checked:border-[#0e4c92] peer-checked:bg-blue-50 peer-checked:text-[#0e4c92] peer-checked:ring-1 peer-checked:ring-[#0e4c92] transition-all duration-200 flex items-center justify-center text-center">
                                                 <span class="text-sm font-medium group-hover:text-gray-900 peer-checked:font-bold"><?= esc($opt->label_jawaban) ?></span>
                                             </div>
@@ -200,7 +217,7 @@
                         <!-- Saran -->
                         <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                             <label class="block font-semibold text-gray-800 mb-3">Saran & Masukan</label>
-                            <textarea name="saran" rows="4" class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-all duration-200" placeholder="Tuliskan saran dan masukan Anda untuk peningkatan kualitas pelayanan kami..."></textarea>
+                            <textarea name="saran_masukan" rows="4" class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-all duration-200" placeholder="Tuliskan saran dan masukan Anda untuk peningkatan kualitas pelayanan kami..."></textarea>
                         </div>
                     <?php endif; ?>
 
@@ -256,6 +273,16 @@
         const stepLine = document.getElementById('step-line');
         const stepDot2 = document.getElementById('step-dot-2');
 
+        // Progress Bar Logic
+        function updateProgress() {
+            const totalQuestions = <?= count($questions) ?>;
+            const answered = document.querySelectorAll('.survey-radio:checked').length;
+            const percent = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+
+            document.getElementById('progress-count').innerText = answered;
+            document.getElementById('progress-bar').style.width = percent + '%';
+        }
+
         btnNext.addEventListener('click', () => {
             // Validate Step 1 Inputs
             const inputs = step1.querySelectorAll('input[required]:not([type="radio"]), select[required]');
@@ -291,6 +318,12 @@
 
                 // Enable required on radio buttons now that they are visible
                 document.querySelectorAll('.survey-radio').forEach(r => r.required = true);
+
+                // Initialize progress listeners
+                document.querySelectorAll('.survey-radio').forEach(radio => {
+                    radio.addEventListener('change', updateProgress);
+                });
+                updateProgress(); // Initial check
             } else {
                 alert('Mohon lengkapi semua data diri terlebih dahulu.');
             }

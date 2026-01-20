@@ -1,0 +1,174 @@
+<?= $this->extend('layouts/admin') ?>
+
+<?= $this->section('content') ?>
+<div x-data="{ 
+    search: '',
+    allData: <?= htmlspecialchars(json_encode($jawaban), ENT_QUOTES, 'UTF-8') ?>,
+    currentPage: 1,
+    itemsPerPage: 10,
+    showModal: false, 
+    isEdit: false,
+    form: { id: '', soal_id: '', label_jawaban: '', bobot_nilai: '' },
+    
+    get filteredData() {
+        if (this.search === '') return this.allData;
+        const lowerSearch = this.search.toLowerCase();
+        return this.allData.filter(item => {
+            return item.label_jawaban.toLowerCase().includes(lowerSearch) || 
+                   item.pertanyaan.toLowerCase().includes(lowerSearch);
+        });
+    },
+
+    get totalPages() {
+        return Math.ceil(this.filteredData.length / this.itemsPerPage);
+    },
+    get paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.filteredData.slice(start, end);
+    },
+    nextPage() { if (this.currentPage < this.totalPages) this.currentPage++; },
+    prevPage() { if (this.currentPage > 1) this.currentPage--; },
+    
+    init() {
+        this.$watch('search', () => this.currentPage = 1);
+    },
+
+    openAdd() {
+        this.isEdit = false;
+        this.form = { id: '', soal_id: '', label_jawaban: '', bobot_nilai: '' };
+        this.showModal = true;
+    },
+    openEdit(item) {
+        this.isEdit = true;
+        this.form = { id: item.id, soal_id: item.soal_id, label_jawaban: item.label_jawaban, bobot_nilai: item.bobot_nilai };
+        this.showModal = true;
+    }
+}">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Master Opsi Jawaban</h1>
+            <p class="text-sm text-gray-500 mt-1">Kelola pilihan jawaban dan bobot nilai untuk setiap pertanyaan</p>
+        </div>
+        <button @click="openAdd()" class="bg-[#0e4c92] hover:bg-[#0a386e] text-white px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm whitespace-nowrap">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Tambah Opsi
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <input type="text" x-model="search" class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#0e4c92] focus:border-[#0e4c92] sm:text-sm transition duration-150 ease-in-out" placeholder="Cari jawaban atau pertanyaan...">
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    <?php if (session()->getFlashdata('success')) : ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline"><?= session()->getFlashdata('success') ?></span>
+        </div>
+    <?php endif; ?>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider border-b border-gray-200">
+                        <th class="px-6 py-4 font-semibold w-16 text-center">No</th>
+                        <th class="px-6 py-4 font-semibold w-1/3">Pertanyaan</th>
+                        <th class="px-6 py-4 font-semibold">Label Jawaban</th>
+                        <th class="px-6 py-4 font-semibold text-center w-24">Bobot</th>
+                        <th class="px-6 py-4 font-semibold text-center w-32">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <template x-for="(item, index) in paginatedData" :key="item.id">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-gray-500 text-sm text-center" x-text="(currentPage - 1) * itemsPerPage + index + 1"></td>
+                            <td class="px-6 py-4 text-gray-600 text-sm" x-text="item.pertanyaan"></td>
+                            <td class="px-6 py-4 text-gray-800 font-medium" x-text="item.label_jawaban"></td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 font-bold text-sm" x-text="item.bobot_nilai"></span>
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-1">
+                                <button @click="openEdit(item)" class="inline-flex items-center justify-center p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <a :href="'<?= base_url('admin/master/jawaban/delete/') ?>' + item.id" onclick="return confirm('Yakin ingin menghapus data ini?')" class="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    </template>
+                    <tr x-show="filteredData.length === 0">
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">Tidak ada data yang cocok.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-6 flex justify-center" x-show="totalPages > 1">
+        <nav class="inline-flex -space-x-px text-sm">
+            <button @click="prevPage" :disabled="currentPage === 1" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50">Previous</button>
+            <span class="flex items-center justify-center px-4 h-8 leading-tight text-gray-500 bg-white border border-gray-300">Halaman <span x-text="currentPage" class="font-bold mx-1"></span> dari <span x-text="totalPages" class="font-bold mx-1"></span></span>
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50">Next</button>
+        </nav>
+    </div>
+
+    <!-- Modal -->
+    <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showModal = false"></div>
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full relative z-10 transform transition-all">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-800" x-text="isEdit ? 'Edit Opsi Jawaban' : 'Tambah Opsi Jawaban'"></h3>
+                    <button @click="showModal = false" class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+                <form action="<?= base_url('admin/master/jawaban/save') ?>" method="post" class="p-6 space-y-4">
+                    <input type="hidden" name="id" x-model="form.id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pertanyaan</label>
+                        <select name="soal_id" x-model="form.soal_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                            <option value="">-- Pilih Pertanyaan --</option>
+                            <?php foreach ($pertanyaan as $p): ?>
+                                <option value="<?= $p->id ?>">[<?= esc($p->nama_layanan) ?>] <?= esc($p->pertanyaan) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Label Jawaban</label>
+                        <input type="text" name="label_jawaban" x-model="form.label_jawaban" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: Sangat Baik">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bobot Nilai</label>
+                        <input type="number" name="bobot_nilai" x-model="form.bobot_nilai" required min="1" max="4" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="1-4">
+                    </div>
+                    <div class="pt-4 flex justify-end space-x-3">
+                        <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-[#0e4c92] text-white rounded-lg hover:bg-[#0a386e] transition-colors font-medium shadow-sm">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->endSection() ?>

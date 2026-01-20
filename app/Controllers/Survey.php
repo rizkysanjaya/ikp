@@ -52,6 +52,11 @@ class Survey extends BaseController
             return redirect()->to('/')->with('error', 'Data layanan belum tersedia.');
         }
 
+        // Check if unit is active
+        if ($layanan->is_active == 0) {
+            return view('survey/unavailable');
+        }
+
         $unitName = $layanan->nama_layanan;
 
         // 3. Fetch questions based on jenis_layanan_id

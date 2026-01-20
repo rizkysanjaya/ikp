@@ -55,13 +55,13 @@
                         </button>
 
                         <div x-show="openSurvei" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" class="pl-11 pr-2 space-y-1">
-                            <a href="<?= base_url('penilaian') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/penilaian') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Input Survei Baru
                             </a>
-                            <a href="<?= base_url('responden') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/responden') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Data Responden
                             </a>
-                            <a href="<?= base_url('laporan') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/laporan') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Laporan IKM
                             </a>
                         </div>
@@ -81,13 +81,16 @@
                         </button>
 
                         <div x-show="openMaster" x-transition class="pl-4 pr-2 space-y-1">
-                            <a href="<?= base_url('unit') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/master/unit') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Unit Layanan
                             </a>
-                            <a href="<?= base_url('soal') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/master/pertanyaan') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Pertanyaan Survei
                             </a>
-                            <a href="<?= base_url('instansi') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/master/jawaban') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                                Opsi Jawaban
+                            </a>
+                            <a href="<?= base_url('admin/master/instansi') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Instansi
                             </a>
 
@@ -99,12 +102,12 @@
                                     </svg>
                                 </button>
                                 <div x-show="openDemo" class="pl-4 space-y-1 mt-1 border-l border-blue-700 ml-8">
-                                    <a href="<?= base_url('pendidikan') ?>" class="block px-3 py-1.5 text-sm text-blue-300 hover:text-white transition-colors">Pendidikan</a>
-                                    <a href="<?= base_url('pekerjaan') ?>" class="block px-3 py-1.5 text-sm text-blue-300 hover:text-white transition-colors">Pekerjaan</a>
+                                    <a href="<?= base_url('admin/master/pendidikan') ?>" class="block px-3 py-1.5 text-sm text-blue-300 hover:text-white transition-colors">Pendidikan</a>
+                                    <a href="<?= base_url('admin/master/pekerjaan') ?>" class="block px-3 py-1.5 text-sm text-blue-300 hover:text-white transition-colors">Pekerjaan</a>
                                 </div>
                             </div>
 
-                            <a href="<?= base_url('unsur') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/master/unsur') ?>" class="flex items-center px-3 py-2 pl-8 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Unsur Pelayanan
                             </a>
                         </div>
@@ -129,10 +132,10 @@
                         </button>
 
                         <div x-show="openSettings" x-transition class="pl-11 pr-2 space-y-1">
-                            <a href="<?= base_url('users') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/users') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Manajemen User
                             </a>
-                            <a href="<?= base_url('profil') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
+                            <a href="<?= base_url('admin/about') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Profil Aplikasi
                             </a>
                         </div>

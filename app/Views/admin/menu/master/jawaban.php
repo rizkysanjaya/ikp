@@ -4,6 +4,7 @@
 <div x-data="{ 
     search: '',
     allData: <?= htmlspecialchars(json_encode($jawaban), ENT_QUOTES, 'UTF-8') ?>,
+    questionsList: <?= htmlspecialchars(json_encode($pertanyaan), ENT_QUOTES, 'UTF-8') ?>,
     currentPage: 1,
     itemsPerPage: 10,
     showModal: false, 
@@ -17,6 +18,12 @@
             return item.label_jawaban.toLowerCase().includes(lowerSearch) || 
                    item.pertanyaan.toLowerCase().includes(lowerSearch);
         });
+    },
+
+    get selectedUnsur() {
+        if (!this.form.soal_id) return '';
+        const q = this.questionsList.find(item => item.id == this.form.soal_id);
+        return q ? q.nama_unsur : '';
     },
 
     get totalPages() {
@@ -145,6 +152,10 @@
                 </div>
                 <form action="<?= base_url('admin/master/jawaban/save') ?>" method="post" class="p-6 space-y-4">
                     <input type="hidden" name="id" x-model="form.id">
+                    <div x-show="form.soal_id">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Unsur Pelayanan</label>
+                        <input type="text" :value="selectedUnsur" readonly class="w-full rounded-lg border border-gray-300 px-4 py-2 bg-gray-100 text-gray-600 focus:outline-none">
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Pertanyaan</label>
                         <select name="soal_id" x-model="form.soal_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">

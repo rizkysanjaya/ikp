@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Filters;
+
+use CodeIgniter\Filters\FilterInterface;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+
+class AuthFilter implements FilterInterface
+{
+    public function before(RequestInterface $request, $arguments = null)
+    {
+        // Check if user is logged in
+        if (!session()->get('isLoggedIn')) {
+            // For AJAX requests (like getUpdates), return 401 instead of redirecting
+            if ($request->isAJAX()) {
+                return service('response')->setStatusCode(401)->setBody('Unauthorized');
+            }
+
+            // For normal page requests, redirect to login
+            return redirect()->to('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+    }
+
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    {
+        // Do nothing here
+    }
+}

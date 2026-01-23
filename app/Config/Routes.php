@@ -13,18 +13,19 @@ $routes->post('login', 'Auth::attemptLogin');
 $routes->get('logout', 'Auth::logout');
 
 // Dashboard
-$routes->group('dashboard', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+$routes->group('dashboard', ['namespace' => 'App\Controllers\Admin', 'filter' => 'auth'], function ($routes) {
     $routes->get('/', 'Dashboard::index');
     $routes->get('getUpdates', 'Dashboard::getUpdates');
 });
 
 // Admin
-$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+$routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'auth'], function ($routes) {
     // Menu
     $routes->group('', ['namespace' => 'App\Controllers\Admin\Menu'], function ($routes) {
         $routes->get('about', 'About::index');
         $routes->get('laporan', 'Laporan::index');
         $routes->get('responden', 'Responden::index');
+        $routes->get('responden/delete/(:num)', 'Responden::delete/$1');
         $routes->get('users', 'Users::index');
         $routes->post('users/save', 'Users::save');
         $routes->get('users/delete/(:num)', 'Users::delete/$1');
@@ -52,6 +53,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
         $routes->get('unit/delete/(:num)', 'Unit::delete/$1');
         $routes->get('pertanyaan', 'Pertanyaan::index');
         $routes->post('pertanyaan/save', 'Pertanyaan::save');
+
         $routes->get('pertanyaan/toggle/(:num)', 'Pertanyaan::toggle/$1');
         $routes->get('pertanyaan/delete/(:num)', 'Pertanyaan::delete/$1');
         $routes->get('jawaban', 'Jawaban::index');

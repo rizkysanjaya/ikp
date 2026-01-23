@@ -55,9 +55,6 @@
                         </button>
 
                         <div x-show="openSurvei" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" class="pl-11 pr-2 space-y-1">
-                            <a href="<?= base_url('admin/penilaian') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
-                                Input Survei Baru
-                            </a>
                             <a href="<?= base_url('admin/responden') ?>" class="block px-3 py-2 text-sm text-blue-200 hover:text-white hover:bg-blue-700/50 rounded-md transition-colors">
                                 Data Responden
                             </a>

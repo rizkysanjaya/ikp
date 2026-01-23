@@ -21,8 +21,9 @@ class Jawaban extends BaseController
             ->findAll();
 
         // Fetch questions with unit info for dropdown
-        $questions = $pertanyaanModel->select('ref_soal.id, ref_soal.pertanyaan, ref_jenis_layanan.nama_layanan')
+        $questions = $pertanyaanModel->select('ref_soal.id, ref_soal.pertanyaan, ref_jenis_layanan.nama_layanan, ref_unsur_pelayanan.nama_unsur')
             ->join('ref_jenis_layanan', 'ref_jenis_layanan.id = ref_soal.jenis_layanan_id')
+            ->join('ref_unsur_pelayanan', 'ref_unsur_pelayanan.id = ref_soal.unsur_id')
             ->where('ref_soal.is_active', 1)
             ->orderBy('ref_jenis_layanan.id', 'ASC')
             ->orderBy('ref_soal.id', 'ASC')

@@ -61,7 +61,7 @@ class Pertanyaan extends BaseController
             $message = 'Pertanyaan baru berhasil ditambahkan.';
         }
 
-        return redirect()->to('admin/menu/master/pertanyaan')->with('success', $message);
+        return redirect()->to('admin/master/pertanyaan')->with('success', $message);
     }
 
     public function toggle($id)
@@ -76,13 +76,13 @@ class Pertanyaan extends BaseController
             return redirect()->to('admin/master/pertanyaan')->with('success', "Pertanyaan berhasil $statusText.");
         }
 
-        return redirect()->to('admin/menu/master/pertanyaan')->with('errors', ['Data tidak ditemukan.']);
+        return redirect()->to('admin/master/pertanyaan')->with('errors', ['Data tidak ditemukan.']);
     }
 
     public function delete($id)
     {
         $model = new RefPertanyaanModel();
         $model->delete($id);
-        return redirect()->to('admin/menu/master/pertanyaan')->with('success', 'Pertanyaan berhasil dihapus.');
+        return redirect()->to('admin/master/pertanyaan')->with('success', 'Pertanyaan berhasil dihapus.');
     }
 }

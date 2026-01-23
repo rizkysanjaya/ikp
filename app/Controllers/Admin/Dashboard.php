@@ -8,11 +8,6 @@ class Dashboard extends BaseController
 {
     public function index()
     {
-        // 1. Cek Login Session
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('login');
-        }
-
         $db = \Config\Database::connect();
 
         // ---------------------------------------------------------
@@ -143,10 +138,6 @@ class Dashboard extends BaseController
     // Tambahkan method ini di dalam Class Dashboard
     public function getUpdates()
     {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setStatusCode(401);
-        }
-
         $db = \Config\Database::connect();
 
         // 1. Hitung Ulang Stats

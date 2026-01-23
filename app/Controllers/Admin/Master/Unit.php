@@ -46,7 +46,7 @@ class Unit extends BaseController
             $message = 'Unit layanan baru berhasil ditambahkan.';
         }
 
-        return redirect()->to('admin/master/unit')->with('success', $message);
+        return redirect()->to('admin/menu/master/unit')->with('success', $message);
     }
 
     public function toggle($id)
@@ -58,16 +58,16 @@ class Unit extends BaseController
             $newStatus = $item->is_active == 1 ? 0 : 1;
             $model->update($id, ['is_active' => $newStatus]);
             $statusText = $newStatus == 1 ? 'diaktifkan' : 'dinonaktifkan';
-            return redirect()->to('admin/master/unit')->with('success', "Unit layanan berhasil $statusText.");
+            return redirect()->to('admin/menu/master/unit')->with('success', "Unit layanan berhasil $statusText.");
         }
 
-        return redirect()->to('admin/master/unit')->with('errors', ['Data tidak ditemukan.']);
+        return redirect()->to('admin/menu/master/unit')->with('errors', ['Data tidak ditemukan.']);
     }
 
     public function delete($id)
     {
         $model = new RefJenisLayananModel();
         $model->delete($id);
-        return redirect()->to('admin/master/unit')->with('success', 'Unit layanan berhasil dihapus.');
+        return redirect()->to('admin/menu/master/unit')->with('success', 'Unit layanan berhasil dihapus.');
     }
 }

@@ -1,15 +1,37 @@
 <?= $this->extend('layouts/admin') ?>
 
 <?= $this->section('content') ?>
-<div class="space-y-6">
+<div class="space-y-6 relative">
+    
+    <!-- Floating Navigation (Sticky) -->
+    <!-- Floating Navigation (Fixed) -->
+    <div class="fixed bottom-8 left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <div class="bg-white/90 backdrop-blur-md shadow-2xl border border-gray-200/50 rounded-full px-2 py-1.5 flex items-center gap-1 pointer-events-auto transition-all hover:scale-105">
+            <button onclick="scrollToSection('section-header')" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-600 hover:text-[#0e4c92] hover:bg-blue-50 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                Atas
+            </button>
+            <div class="w-px h-4 bg-gray-300 mx-1"></div>
+            <button id="btn-filter" onclick="scrollToSection('section-filter')" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-600 hover:text-[#0e4c92] hover:bg-blue-50 transition-colors">
+                Filter
+            </button>
+            <button id="btn-table" onclick="scrollToSection('section-table')" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-600 hover:text-[#0e4c92] hover:bg-blue-50 transition-colors">
+                Tabel Data
+            </button>
+            <button id="btn-charts" onclick="scrollToSection('section-charts')" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-600 hover:text-[#0e4c92] hover:bg-blue-50 transition-colors">
+                Grafik
+            </button>
+        </div>
+    </div>
+
     <!-- Page Header -->
-    <div>
+    <div id="section-header">
         <h1 class="text-2xl font-bold text-gray-800">Laporan IKM</h1>
         <p class="text-sm text-gray-500 mt-1">Rekapitulasi Indeks Kepuasan Masyarakat</p>
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div id="section-filter" class="scroll-mt-24 bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
         <form action="" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
@@ -43,7 +65,7 @@
             </div>
         <?php else: ?>
             <!-- Report Section -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div id="section-table" class="scroll-mt-24 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <!-- Legend -->
                 <div class="p-4 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
                     <span class="font-bold">Keterangan Indikator:</span>
@@ -96,8 +118,24 @@
                                     <td class="px-4 py-3 border-r border-gray-200 text-xs">
                                         <?= date('d-m-Y H:i', strtotime($row->tanggal_survei)) ?>
                                     </td>
-                                    <td class="px-4 py-3 text-xs italic text-gray-600">
-                                        <?= esc($row->saran_masukan) ?>
+                                    <td class="px-4 py-3 text-xs italic text-gray-600" data-full-text="<?= esc($row->saran_masukan, 'attr') ?>">
+                                        <?php $saran = (string)$row->saran_masukan; ?>
+                                        <?php if (mb_strlen($saran) > 100): ?>
+                                            <div x-data="{ expanded: false }">
+                                                <span x-show="!expanded">
+                                                    <?= esc(mb_substr($saran, 0, 100)) ?>...
+                                                </span>
+                                                <span x-show="expanded" style="display: none;">
+                                                    <?= esc($saran) ?>
+                                                </span>
+                                                <button @click="expanded = !expanded" class="text-blue-600 hover:text-blue-800 font-semibold ml-1 focus:outline-none underline">
+                                                    <span x-show="!expanded">Lihat Selengkapnya</span>
+                                                    <span x-show="expanded">Sembunyikan</span>
+                                                </button>
+                                            </div>
+                                        <?php else: ?>
+                                            <?= esc($saran) ?>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -107,31 +145,43 @@
                             <!-- Jumlah Nilai -->
                             <tr>
                                 <td colspan="2" class="px-4 py-3 text-right border-r border-gray-300">Jumlah Nilai Per Parameter</td>
-                                <?php foreach ($unsur as $u): ?>
-                                    <td class="px-2 py-3 text-center border-r border-gray-300">
-                                        <?= number_format($reportData['stats']['total_per_unsur'][$u->id], 0, ',', '.') ?>
-                                    </td>
-                                <?php endforeach; ?>
+                                <td colspan="<?= count($unsur) ?>" class="px-0">
+                                    <div class="grid" style="grid-template-columns: repeat(<?= count($unsur) ?>, 1fr);">
+                                        <?php foreach ($unsur as $u): ?>
+                                            <div class="px-2 py-3 text-center border-r border-gray-300">
+                                                <?= number_format($reportData['stats']['total_per_unsur'][$u->id], 0, ',', '.') ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </td>
                                 <td colspan="2" class="bg-gray-100"></td>
                             </tr>
                             <!-- NRR -->
                             <tr class="row-nrr">
                                 <td colspan="2" class="px-4 py-3 text-right border-r border-gray-300">Nilai Rata-rata (NRR)</td>
-                                <?php foreach ($unsur as $u): ?>
-                                    <td class="px-2 py-3 text-center border-r border-gray-300">
-                                        <?= number_format($reportData['stats']['nrr_per_unsur'][$u->id], 2, ',', '.') ?>
-                                    </td>
-                                <?php endforeach; ?>
+                                <td colspan="<?= count($unsur) ?>" class="px-0">
+                                    <div class="grid" style="grid-template-columns: repeat(<?= count($unsur) ?>, 1fr);">
+                                        <?php foreach ($unsur as $u): ?>
+                                            <div class="px-2 py-3 text-center border-r border-gray-300">
+                                                <?= number_format($reportData['stats']['nrr_per_unsur'][$u->id], 2, ',', '.') ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </td>
                                 <td colspan="2" class="bg-gray-100"></td>
                             </tr>
                             <!-- NRR Tertimbang -->
                             <tr class="row-indeks">
                                 <td colspan="2" class="px-4 py-3 text-right border-r border-gray-300">Nilai Indeks Per Parameter</td>
-                                <?php foreach ($unsur as $u): ?>
-                                    <td class="px-2 py-3 text-center border-r border-gray-300 text-blue-700">
-                                        <?= number_format($reportData['stats']['nrr_tertimbang'][$u->id], 2, ',', '.') ?>
-                                    </td>
-                                <?php endforeach; ?>
+                                <td colspan="<?= count($unsur) ?>" class="px-0">
+                                    <div class="grid" style="grid-template-columns: repeat(<?= count($unsur) ?>, 1fr);">
+                                        <?php foreach ($unsur as $u): ?>
+                                            <div class="px-2 py-3 text-center border-r border-gray-300 text-blue-700">
+                                                <?= number_format($reportData['stats']['nrr_tertimbang'][$u->id], 2, ',', '.') ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </td>
                                 <td colspan="2" class="bg-gray-100"></td>
                             </tr>
                             <!-- Final IKM -->
@@ -159,7 +209,7 @@
             </div>
 
             <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div id="section-charts" class="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                 <!-- Bar Chart -->
                 <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-gray-800 mb-4 text-lg">Grafik Nilai Rata-rata Per Unsur</h3>
@@ -167,17 +217,78 @@
                 </div>
                 <!-- Pie Charts Grid -->
                 <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-gray-800 mb-4 text-lg">Distribusi Jawaban (Drilldown)</h3>
-                    <div id="chart-drilldown" class="w-full h-[500px]"></div>
+                    <h3 class="font-bold text-gray-800 mb-4 text-lg">Distribusi Jawaban Per Unsur</h3>
+                    <div id="charts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
             </div>
         <?php endif; ?>
     <?php endif; ?>
 </div>
 
+<script>
+    // Smooth Scroll
+    function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            const offset = 100; // Increased offset for fixed header
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+        }
+    }
+
+    // ScrollSpy (Active State Tracking)
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = ['section-filter', 'section-table', 'section-charts'];
+        const navButtons = {
+            'section-filter': document.getElementById('btn-filter'),
+            'section-table': document.getElementById('btn-table'),
+            'section-charts': document.getElementById('btn-charts')
+        };
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px', // Trigger active state when section is near top
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Remove active class from all
+                    Object.values(navButtons).forEach(btn => {
+                        if(btn) {
+                            btn.classList.remove('text-[#0e4c92]', 'bg-blue-50', 'ring-1', 'ring-blue-100');
+                            btn.classList.add('text-gray-600');
+                        }
+                    });
+
+                    // Add active class to current
+                    const activeBtn = navButtons[entry.target.id];
+                    if (activeBtn) {
+                        activeBtn.classList.remove('text-gray-600');
+                        activeBtn.classList.add('text-[#0e4c92]', 'bg-blue-50', 'ring-1', 'ring-blue-100');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+    });
+</script>
+
+
 <!-- Highcharts Library -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/drilldown.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <!-- SheetJS with Styling Support -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
@@ -194,39 +305,23 @@
         const ws = wb.Sheets["Laporan IKM"];
 
         // 1. Define Column Widths
-        ws['!cols'] = [{
+        const cols = [{
                 wch: 5
             }, // No
             {
                 wch: 35
-            }, // Nama Responden
-            // P1-P9 (9 Columns)
-            {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            }, {
-                wch: 5
-            },
-            {
-                wch: 18
-            }, // Tanggal
-            {
-                wch: 40
-            } // Saran
+            } // Nama Responden
         ];
+        unsurData.forEach(() => cols.push({
+            wch: 5
+        })); // Unsur Columns (Dynamic)
+        cols.push({
+            wch: 18
+        }); // Tanggal
+        cols.push({
+            wch: 40
+        }); // Saran
+        ws['!cols'] = cols;
 
         // 2. Apply Styles
         const range = XLSX.utils.decode_range(ws['!ref']);
@@ -309,18 +404,34 @@
 
                 // Fix Content Formatting (Add Newlines)
                 let cellVal = ws[cellRef].v;
-                if (typeof cellVal === 'string' && domRow) {
+                if (domRow) {
                     const parentTag = domRow.parentElement ? domRow.parentElement.tagName : '';
+                    const dateColIndex = 2 + unsurData.length;
 
                     // 1. Respondent Name & Instansi (Column 1, Body Rows)
-                    if (C === 1 && parentTag === 'TBODY') {
+                    if (C === 1 && parentTag === 'TBODY' && typeof cellVal === 'string') {
                         if (cellVal.includes('Instansi:') && !cellVal.includes('\nInstansi:')) {
                             ws[cellRef].v = cellVal.replace(/Instansi:/, '\nInstansi:');
                         }
                     }
                     // 2. Mutu Pelayanan Score (Footer)
-                    if (parentTag === 'TFOOT' && /Mutu [A-D]/.test(cellVal) && !cellVal.includes('\nMutu ')) {
+                    if (parentTag === 'TFOOT' && typeof cellVal === 'string' && /Mutu [A-D]/.test(cellVal) && !cellVal.includes('\nMutu ')) {
                         ws[cellRef].v = cellVal.replace(/(Mutu [A-D])/, '\n$1');
+                    }
+                    // 3. Kritik/Saran (Column 12) - Restore full text if truncated
+                    if (C === (dateColIndex + 1) && parentTag === 'TBODY') {
+                        const fullText = domRow.cells[C]?.getAttribute('data-full-text');
+                        if (fullText) {
+                            ws[cellRef].v = fullText;
+                        }
+                    }
+
+                    // 4. Fix Date Format (Column Date) - Force String
+                    if (C === dateColIndex && parentTag === 'TBODY') {
+                        if (domRow.cells[C]) {
+                            ws[cellRef].v = domRow.cells[C].innerText.trim();
+                            ws[cellRef].t = 's'; // Force Text Type
+                        }
                     }
                 }
 
@@ -506,49 +617,62 @@
                     credits: {
                         enabled: false
                     },
+                    accessibility: {
+                        announceNewData: {
+                            enabled: true
+                        },
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
                     tooltip: {
-                        pointFormat: '<b>{point.y}</b> Responden ({point.percentage:.1f}%)'
+                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> Responden ({point.percentage:.1f}%)<br/>'
                     },
                     plotOptions: {
                         pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
+                            borderRadius: 5,
+                            dataLabels: [{
                                 enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                                distance: -20,
+                                distance: 15,
+                                format: '{point.name}'
+                            }, {
+                                enabled: true,
+                                distance: '-30%',
+                                filter: {
+                                    property: 'percentage',
+                                    operator: '>',
+                                    value: 5
+                                },
+                                format: '{point.percentage:.1f} %',
                                 style: {
-                                    fontSize: '9px',
+                                    fontSize: '0.9em',
                                     textOutline: 'none'
                                 }
-                            },
-                            showInLegend: true
+                            }],
+                            showInLegend: false
                         }
-                    },
-                    legend: {
-                        enabled: false
                     },
                     series: [{
                         name: 'Responden',
                         colorByPoint: true,
-                        innerSize: '50%', // Donut style looks cleaner
                         data: [{
-                                name: '1',
+                                name: 'Tidak Baik',
                                 y: f[1],
                                 color: '#EF4444'
                             },
                             {
-                                name: '2',
+                                name: 'Kurang Baik',
                                 y: f[2],
                                 color: '#F97316'
                             },
                             {
-                                name: '3',
+                                name: 'Baik',
                                 y: f[3],
                                 color: '#3B82F6'
                             },
                             {
-                                name: '4',
+                                name: 'Sangat Baik',
                                 y: f[4],
                                 color: '#10B981'
                             }

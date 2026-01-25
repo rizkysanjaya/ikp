@@ -18,13 +18,13 @@
 <body class="bg-gray-100 font-sans antialiased">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside class="w-72 bg-gradient-to-br from-[#0e4c92] to-[#0a386e] text-white flex-shrink-0 hidden md:flex flex-col transition-all duration-300 relative overflow-hidden shadow-2xl">
+        <aside class="w-72 bg-gradient-to-br from-[#0e4c92] to-[#0a386e] text-white flex-shrink-0 hidden md:flex flex-col transition-all duration-300 sticky top-0 h-screen overflow-hidden shadow-2xl z-30">
             <!-- Decorative Background Orbs -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
 
             <!-- Logo Area -->
-            <div class="h-20 flex items-center justify-center border-b border-white/10 relative z-10 backdrop-blur-sm">
+            <div class="h-20 flex items-center justify-center border-b border-white/10 relative z-10 backdrop-blur-sm flex-shrink-0">
                 <span class="text-2xl font-bold tracking-wider flex items-center gap-3">
                     <div class="p-2 bg-white/10 rounded-lg backdrop-blur-md border border-white/20 shadow-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +36,7 @@
             </div>
 
             <!-- Nav Content -->
-            <div class="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar relative z-10" x-data="{ openSurvei: false, openMaster: false, openDemo: false, openSettings: false }">
+            <div class="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar relative z-10" x-data="{ activeMenu: null, openDemo: false }">
                 <nav class="space-y-4"> <!-- Increased spacing -->
 
                     <div>
@@ -53,18 +53,18 @@
                         <div class="px-4 mb-2 text-xs font-bold text-blue-200/60 uppercase tracking-widest">Aplikasi</div>
                         <div class="space-y-1">
                             <!-- Survei Menu -->
-                            <button @click="openSurvei = !openSurvei" :class="{'bg-white/5': openSurvei}" class="w-full flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
+                            <button @click="activeMenu = activeMenu === 'survei' ? null : 'survei'" :class="{'bg-white/5': activeMenu === 'survei'}" class="w-full flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 mr-3 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                                     </svg>
                                     <span class="font-medium">Manajemen Survei</span>
                                 </div>
-                                <svg :class="{'rotate-180': openSurvei}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg :class="{'rotate-180': activeMenu === 'survei'}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div x-show="openSurvei" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
+                            <div x-show="activeMenu === 'survei'" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
                                 <a href="<?= base_url('admin/responden') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2.5"></span> Data Responden
                                 </a>
@@ -74,18 +74,18 @@
                             </div>
 
                             <!-- Master Data Menu -->
-                            <button @click="openMaster = !openMaster" :class="{'bg-white/5': openMaster}" class="w-full mt-2 flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
+                            <button @click="activeMenu = activeMenu === 'master' ? null : 'master'" :class="{'bg-white/5': activeMenu === 'master'}" class="w-full mt-2 flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 mr-3 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
                                     </svg>
                                     <span class="font-medium">Master Data</span>
                                 </div>
-                                <svg :class="{'rotate-180': openMaster}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg :class="{'rotate-180': activeMenu === 'master'}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div x-show="openMaster" x-transition class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
+                            <div x-show="activeMenu === 'master'" x-transition class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
                                 <a href="<?= base_url('admin/master/unit') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2.5"></span> Unit Layanan
                                 </a>
@@ -121,7 +121,7 @@
 
                     <div>
                         <div class="px-4 mb-2 text-xs font-bold text-blue-200/60 uppercase tracking-widest">Pengaturan</div>
-                         <button @click="openSettings = !openSettings" :class="{'bg-white/5': openSettings}" class="w-full flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
+                         <button @click="activeMenu = activeMenu === 'settings' ? null : 'settings'" :class="{'bg-white/5': activeMenu === 'settings'}" class="w-full flex items-center justify-between px-4 py-3 text-blue-100 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-transparent focus:outline-none group">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 mr-3 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -129,11 +129,11 @@
                                 </svg>
                                 <span class="font-medium">Konfigurasi</span>
                             </div>
-                            <svg :class="{'rotate-180': openSettings}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg :class="{'rotate-180': activeMenu === 'settings'}" class="w-4 h-4 transition-transform transform opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
-                        <div x-show="openSettings" x-transition class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
+                        <div x-show="activeMenu === 'settings'" x-transition class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
                             <a href="<?= base_url('admin/users') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2.5"></span> Manajemen User
                             </a>
@@ -146,7 +146,7 @@
             </div>
 
             <!-- Footer Sidebar -->
-            <div class="p-4 border-t border-white/10 bg-black/20 relative z-10 backdrop-blur-sm">
+            <div class="p-4 border-t border-white/10 bg-black/20 relative z-10 backdrop-blur-sm flex-shrink-0">
                 <a href="<?= base_url('logout') ?>" class="flex items-center px-4 py-3 text-red-100 hover:text-white hover:bg-red-500/20 rounded-xl transition-all duration-300 group border border-transparent hover:border-red-500/30">
                     <div class="p-1.5 bg-red-500/10 rounded-lg mr-3 group-hover:bg-red-500 group-hover:text-white transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

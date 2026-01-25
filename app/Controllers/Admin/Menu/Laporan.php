@@ -65,6 +65,7 @@ class Laporan extends BaseController
                     'total_per_unsur' => [],
                     'nrr_per_unsur' => [],
                     'nrr_tertimbang' => [],
+                    'frequency' => [],
                     'ikm_total' => 0,
                     'ikm_konversi' => 0
                 ];
@@ -76,6 +77,7 @@ class Laporan extends BaseController
                 // Initialize totals
                 foreach ($data['unsur'] as $u) {
                     $stats['total_per_unsur'][$u->id] = 0;
+                    $stats['frequency'][$u->id] = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
                 }
 
                 // Sum scores
@@ -85,6 +87,10 @@ class Laporan extends BaseController
                         $score = $mappedAnswers[$r->id][$u->id] ?? 0;
                         $r->scores[$u->id] = $score;
                         $stats['total_per_unsur'][$u->id] += $score;
+
+                        if ($score >= 1 && $score <= 4) {
+                            $stats['frequency'][$u->id][$score]++;
+                        }
                     }
                 }
 

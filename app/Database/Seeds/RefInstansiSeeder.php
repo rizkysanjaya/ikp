@@ -640,7 +640,7 @@ class RefInstansiSeeder extends Seeder
             ['id' => '8303', 'nama_instansi' => 'Pemerintah Kab. Mamasa', 'is_active' => 1],
             ['id' => '8304', 'nama_instansi' => 'Pemerintah Kab. Polewali Mandar', 'is_active' => 1],
             ['id' => '8305', 'nama_instansi' => 'Pemerintah Kab. Majene', 'is_active' => 1],
-            ['id' => '8306', 'nama_instansi' => 'Pemerintah Kab. Mamuju Tengah', 'is_active' =>. 1],
+            ['id' => '8306', 'nama_instansi' => 'Pemerintah Kab. Mamuju Tengah', 'is_active' => 1],
             ['id' => '8400', 'nama_instansi' => 'Pemerintah Provinsi Kalimantan Utara', 'is_active' => 1],
             ['id' => '8401', 'nama_instansi' => 'Pemerintah Kab. Bulungan', 'is_active' => 1],
             ['id' => '8402', 'nama_instansi' => 'Pemerintah Kab. Malinau', 'is_active' => 1],

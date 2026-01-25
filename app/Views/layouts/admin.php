@@ -16,9 +16,17 @@
 </head>
 
 <body class="bg-gray-100 font-sans antialiased">
-    <div class="min-h-screen flex">
+    <div class="min-h-screen flex" x-data="{ sidebarOpen: false }">
+        <!-- Mobile Backdrop -->
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/80 z-40 md:hidden"></div>
+
         <!-- Sidebar -->
-        <aside class="w-72 bg-gradient-to-br from-[#0e4c92] to-[#0a386e] text-white flex-shrink-0 hidden md:flex flex-col transition-all duration-300 sticky top-0 h-screen overflow-hidden shadow-2xl z-30">
+        <aside :class="sidebarOpen ? 'translate-x-0 fixed inset-y-0 z-50' : '-translate-x-full md:translate-x-0 md:sticky md:top-0 h-screen'" class="w-72 bg-gradient-to-br from-[#0e4c92] to-[#0a386e] text-white flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:flex overflow-hidden shadow-2xl z-30 fixed pb-20 md:pb-0">
+            <!-- Close Button (Mobile Only) -->
+            <button @click="sidebarOpen = false" class="md:hidden absolute top-4 right-4 text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
             <!-- Decorative Background Orbs -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
@@ -162,7 +170,7 @@
             <!-- Glass Header -->
             <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-200/60 flex items-center justify-between px-6 lg:px-8 z-20 sticky top-0 transition-all duration-300">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden p-2 -ml-2 text-gray-500 hover:text-[#0e4c92] hover:bg-blue-50 rounded-lg transition-colors">
+                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 text-gray-500 hover:text-[#0e4c92] hover:bg-blue-50 rounded-lg transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -176,12 +184,7 @@
 
                 <div class="flex items-center space-x-6">
                     <!-- Notification Bell (Example) -->
-                    <button class="relative p-2 text-gray-400 hover:text-[#0e4c92] transition-colors rounded-full hover:bg-blue-50">
-                        <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                        </svg>
-                    </button>
+                    <!-- Notification Removed -->
 
                     <div class="flex items-center gap-4 pl-6 border-l border-gray-100">
                         <div class="text-right hidden sm:block">

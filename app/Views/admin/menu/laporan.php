@@ -287,7 +287,7 @@
                             Distribusi Jawaban Per Unsur
                         </h3>
                     </div>
-                    <div id="charts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                    <div id="charts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 [&>*:last-child]:lg:col-span-2 [&>*:last-child]:lg:w-3/4 [&>*:last-child]:lg:mx-auto"></div>
                 </div>
             </div>
         <?php endif; ?>
@@ -379,7 +379,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         <?php if (!empty($reportData)): ?>
             // Data Preparation
-            const stats = reportStats;
+            const stats = window.ReportStats;
+            const unsurData = window.UnsurData;
 
             // 1. Bar Chart (NRR per Unsur)
             const nrrValues = unsurData.map(u => parseFloat(parseFloat(stats.nrr_per_unsur[u.id]).toFixed(2)));

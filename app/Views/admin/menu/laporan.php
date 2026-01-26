@@ -370,6 +370,7 @@
     window.ReportStats = <?= ($reportData && !empty($reportData['stats'])) ? json_encode($reportData['stats']) : 'null' ?>;
     window.UnsurData = <?= !empty($unsur) ? json_encode($unsur) : '[]' ?>;
     window.RespondentsData = <?= ($reportData && !empty($reportData['respondents'])) ? json_encode($reportData['respondents']) : '[]' ?>;
+    window.ChartOptions = <?= !empty($chartOptions) ? json_encode($chartOptions) : '{}' ?>;
 </script>
 
 <!-- External Export Scripts -->
@@ -381,6 +382,7 @@
             // Data Preparation
             const stats = window.ReportStats;
             const unsurData = window.UnsurData;
+            const chartOptions = window.ChartOptions;
 
             // 1. Bar Chart (NRR per Unsur)
             const nrrValues = unsurData.map(u => parseFloat(parseFloat(stats.nrr_per_unsur[u.id]).toFixed(2)));
@@ -443,6 +445,7 @@
 
             unsurData.forEach(u => {
                 const f = stats.frequency[u.id];
+                const opts = chartOptions[u.id] || {};
 
                 // Create wrapper
                 const wrapper = document.createElement('div');
@@ -516,22 +519,22 @@
                         name: 'Responden',
                         colorByPoint: true,
                         data: [{
-                                name: 'Tidak Baik',
+                                name: opts[1] || 'Tidak Baik',
                                 y: f[1],
                                 color: '#EF4444'
                             },
                             {
-                                name: 'Kurang Baik',
+                                name: opts[2] || 'Kurang Baik',
                                 y: f[2],
                                 color: '#F97316'
                             },
                             {
-                                name: 'Baik',
+                                name: opts[3] || 'Baik',
                                 y: f[3],
                                 color: '#3B82F6'
                             },
                             {
-                                name: 'Sangat Baik',
+                                name: opts[4] || 'Sangat Baik',
                                 y: f[4],
                                 color: '#10B981'
                             }

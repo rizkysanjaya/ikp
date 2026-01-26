@@ -8,6 +8,9 @@ use App\Models\SurveyRespondenModel;
 use App\Models\SurveyJawabanModel;
 use App\Models\RefUnsurPelayananModel;
 
+use App\Models\RefPertanyaanModel;
+use App\Models\RefJawabanModel;
+
 class Laporan extends BaseController
 {
     public function index()
@@ -16,6 +19,8 @@ class Laporan extends BaseController
         $respondenModel = new SurveyRespondenModel();
         $jawabanModel = new SurveyJawabanModel();
         $unsurModel = new RefUnsurPelayananModel();
+        $pertanyaanModel = new RefPertanyaanModel();
+        $refJawabanModel = new RefJawabanModel();
 
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
@@ -26,6 +31,7 @@ class Laporan extends BaseController
             'layanan' => $layananModel->where('is_active', 1)->findAll(),
             'unsur' => $unsurModel->orderBy('id', 'ASC')->findAll(),
             'reportData' => null,
+            'chartOptions' => [], // Default empty
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,
@@ -34,6 +40,33 @@ class Laporan extends BaseController
         ];
 
         if ($startDate && $endDate && $layananId) {
+            // 0. Get Dynamic Options for Charts
+            // Fetch questions for this service
+            $pertanyaan = $pertanyaanModel->where('jenis_layanan_id', $layananId)->where('is_active', 1)->findAll();
+            $pertanyaanIds = array_column($pertanyaan, 'id');
+            
+            $chartOptions = [];
+            if (!empty($pertanyaanIds)) {
+                // Fetch answers for these questions
+                $opsi = $refJawabanModel->whereIn('soal_id', $pertanyaanIds)->orderBy('bobot_nilai', 'ASC')->findAll();
+                
+                // Map Soal ID back to Unsur ID
+                $soalToUnsur = [];
+                foreach($pertanyaan as $p) {
+                    $soalToUnsur[$p->id] = $p->unsur_id;
+                }
+
+                // Group options by Unsur ID
+                foreach($opsi as $o) {
+                    if (isset($soalToUnsur[$o->soal_id])) {
+                        $uId = $soalToUnsur[$o->soal_id];
+                        // Store label keyed by weight (1-4)
+                        $chartOptions[$uId][$o->bobot_nilai] = $o->label_jawaban;
+                    }
+                }
+            }
+            $data['chartOptions'] = $chartOptions;
+
             // 1. Get Respondents
             $respondents = $respondenModel->select('trans_responden.*, ref_instansi.nama_instansi')
                 ->join('ref_instansi', 'ref_instansi.id = trans_responden.instansi_id', 'left')

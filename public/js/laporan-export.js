@@ -17,7 +17,15 @@ function exportToExcel() {
         return;
     }
 
-    // 1. Prepare Header
+    // 0. Prepare Metadata
+    const layananEl = document.querySelector('select[name="layanan_id"] option:checked');
+    const startEl = document.querySelector('input[name="start_date"]');
+    const endEl = document.querySelector('input[name="end_date"]');
+
+    const layananText = layananEl ? layananEl.text : '-';
+    const periodeText = (startEl && endEl) ? `${startEl.value} s.d ${endEl.value}` : '-';
+    
+    // 1. Prepare Table Header
     const header1 = ["No", "Nama Responden"];
     const header2 = ["", ""];
     
@@ -83,21 +91,42 @@ function exportToExcel() {
         for(let i=0; i<unsurData.length + 1; i++) mutuRow.push(""); 
     footerRows.push(mutuRow);
 
-    // CONSTRUCT SHEET
-    const wsData = [header1, header2, ...bodyRows, ...footerRows];
+    // 4. Construct Excel Rows with Top Header
+    const topHeaderRows = [
+        ["LAPORAN INDEKS KEPUASAN MASYARAKAT (IKM)"],
+        [`Unit Layanan: ${layananText}`],
+        [`Periode: ${periodeText}`],
+        [`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`],
+        [""] // Spacer
+    ];
+
+    const wsData = [...topHeaderRows, header1, header2, ...bodyRows, ...footerRows];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
+    // OFFSET for Table Start (5 rows of header)
+    const T_OFFSET = 5;
+
     // MERGES
+    // Top Header Merges (Span across all columns)
+    const totalCols = header1.length - 1;
     const merges = [
-        { s: {r:0, c:0}, e: {r:1, c:0} }, // No
-        { s: {r:0, c:1}, e: {r:1, c:1} }, // Nama
-        { s: {r:0, c:2}, e: {r:0, c:2 + unsurData.length - 1} }, // Header "Nilai"
-        { s: {r:0, c:2 + unsurData.length}, e: {r:1, c:2 + unsurData.length} }, // Tanggal
-        { s: {r:0, c:2 + unsurData.length + 1}, e: {r:1, c:2 + unsurData.length + 1} }, // Saran
+        { s: {r:0, c:0}, e: {r:0, c:totalCols} },
+        { s: {r:1, c:0}, e: {r:1, c:totalCols} },
+        { s: {r:2, c:0}, e: {r:2, c:totalCols} },
+        { s: {r:3, c:0}, e: {r:3, c:totalCols} },
     ];
+
+    // Table Header Merges
+    merges.push(
+        { s: {r:T_OFFSET, c:0}, e: {r:T_OFFSET+1, c:0} }, // No
+        { s: {r:T_OFFSET, c:1}, e: {r:T_OFFSET+1, c:1} }, // Nama
+        { s: {r:T_OFFSET, c:2}, e: {r:T_OFFSET, c:2 + unsurData.length - 1} }, // Header "Nilai"
+        { s: {r:T_OFFSET, c:2 + unsurData.length}, e: {r:T_OFFSET+1, c:2 + unsurData.length} }, // Tanggal
+        { s: {r:T_OFFSET, c:2 + unsurData.length + 1}, e: {r:T_OFFSET+1, c:2 + unsurData.length + 1} } // Saran
+    );
     
     // Footer Merges
-    const footerStart = 2 + bodyRows.length;
+    const footerStart = T_OFFSET + 2 + bodyRows.length;
     // Merge "Nilai Rata-rata" label (Cols 0-1)
     for (let i=0; i<3; i++) {
             merges.push({ s: {r:footerStart+i, c:0}, e: {r:footerStart+i, c:1} });
@@ -133,63 +162,74 @@ function exportToExcel() {
             
             const style = {
                 font: { name: "Arial", sz: 10 },
-                border: {
+                border: {},
+                alignment: { vertical: "center", wrapText: true }
+            };
+
+            // Top Header Styling
+            if (R < T_OFFSET) {
+                style.font.bold = true;
+                if(R === 0) style.font.sz = 14; 
+                // No border for top header
+            } 
+            // Table Styling (Headers + Body + Footer)
+            else {
+                style.border = {
                     top: {style: "thin", color: {rgb: "CCCCCC"}},
                     bottom: {style: "thin", color: {rgb: "CCCCCC"}},
                     left: {style: "thin", color: {rgb: "CCCCCC"}},
                     right: {style: "thin", color: {rgb: "CCCCCC"}}
-                },
-                alignment: { vertical: "center", wrapText: true }
-            };
+                };
 
-            // Alignment
-            if (C === 0 || (C >= 2 && C < 2 + unsurData.length) || C === 2 + unsurData.length) {
-                style.alignment.horizontal = "center";
-            }
+                // Alignment
+                if (C === 0 || (C >= 2 && C < 2 + unsurData.length) || C === 2 + unsurData.length) {
+                    style.alignment.horizontal = "center";
+                }
 
-            // HEADER STYLES
-            if (R < 2) {
-                style.fill = { fgColor: { rgb: "E5E7EB" } }; // Gray-200
-                style.font.bold = true;
-                style.alignment.horizontal = "center";
-            }
-
-            // FOOTER STYLES
-            if (R >= footerStart) {
+                // TABLE HEADERS
+                if (R >= T_OFFSET && R < T_OFFSET + 2) {
+                    style.fill = { fgColor: { rgb: "E5E7EB" } }; // Gray-200
                     style.font.bold = true;
-                    style.alignment.horizontal = (C >= 2 && C < 2 + unsurData.length) ? "center" : "right";
-                    
-                    // Specific Footer Colors
-                    if (R === footerStart) style.fill = { fgColor: { rgb: "F3F4F6" } }; // Total
-                    if (R === ikmIdx) { // IKM
-                        style.fill = { fgColor: { rgb: "EFF6FF" } }; // Blue-50
-                        style.font.color = { rgb: "0E4C92" };
-                        style.font.sz = 14;
-                        if (C === 2) style.alignment.horizontal = "center";
-                    }
-                    if (R === mutuIdx) { // Mutu
-                    // Dynamic Color based on Class
-                    let color = "FFFFFF";
-                    if (reportStats.mutu === 'A') color = "D1FAE5"; // Emerald
-                    if (reportStats.mutu === 'B') color = "DBEAFE"; // Blue
-                    if (reportStats.mutu === 'C') color = "FEF9C3"; // Yellow
-                    if (reportStats.mutu === 'D') color = "FEE2E2"; // Red
-                    style.fill = { fgColor: { rgb: color } };
-                    style.font.sz = 14;
-                    if (C === 2) style.alignment.horizontal = "center";
-                    }
-            }
+                    style.alignment.horizontal = "center";
+                }
 
+                // FOOTER STYLES
+                if (R >= footerStart) {
+                        style.font.bold = true;
+                        style.alignment.horizontal = (C >= 2 && C < 2 + unsurData.length) ? "center" : "right";
+                        
+                        // Specific Footer Colors
+                        if (R === footerStart) style.fill = { fgColor: { rgb: "F3F4F6" } }; // Total
+                        if (R === ikmIdx) { // IKM
+                            style.fill = { fgColor: { rgb: "EFF6FF" } }; // Blue-50
+                            style.font.color = { rgb: "0E4C92" };
+                            style.font.sz = 14;
+                            if (C === 2) style.alignment.horizontal = "center";
+                        }
+                        if (R === mutuIdx) { // Mutu
+                            // Dynamic Color based on Class
+                            let color = "FFFFFF";
+                            if (reportStats.mutu === 'A') color = "D1FAE5"; // Emerald
+                            if (reportStats.mutu === 'B') color = "DBEAFE"; // Blue
+                            if (reportStats.mutu === 'C') color = "FEF9C3"; // Yellow
+                            if (reportStats.mutu === 'D') color = "FEE2E2"; // Red
+                            style.fill = { fgColor: { rgb: color } };
+                            style.font.sz = 14;
+                            if (C === 2) style.alignment.horizontal = "center";
+                        }
+                }
+            }
             ws[cellRef].s = style;
         }
     }
     // Set Row Heights
     const wsrows = [];
-        wsrows[0] = { hpx: 25 };
-        wsrows[1] = { hpx: 25 };
-        wsrows[ikmIdx] = { hpx: 35 };
-        wsrows[mutuIdx] = { hpx: 40 };
-        ws['!rows'] = wsrows;
+    wsrows[0] = { hpx: 25 }; 
+    wsrows[T_OFFSET] = { hpx: 25 }; // Table Header
+    wsrows[T_OFFSET + 1] = { hpx: 25 };
+    wsrows[ikmIdx] = { hpx: 35 };
+    wsrows[mutuIdx] = { hpx: 40 };
+    ws['!rows'] = wsrows;
 
     // EXPORT
     const wb = XLSX.utils.book_new();

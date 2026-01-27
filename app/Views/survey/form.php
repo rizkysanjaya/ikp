@@ -54,6 +54,23 @@
         border-color: #0e4c92;
         box-shadow: 0 0 0 2px rgba(14, 76, 146, 0.2);
     }
+    
+    /* Validation Error Styles */
+    .input-error {
+        border-color: #ef4444 !important; /* red-500 */
+        background-color: #fef2f2; /* red-50 */
+    }
+    .text-error {
+        color: #ef4444;
+        font-size: 0.75rem; /* text-xs */
+        margin-top: 0.25rem;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -283,28 +300,139 @@
             document.getElementById('progress-bar').style.width = percent + '%';
         }
 
-        btnNext.addEventListener('click', () => {
-            // Validate Step 1 Inputs
-            const inputs = step1.querySelectorAll('input[required]:not([type="radio"]), select[required]');
-            let isValid = true;
-            inputs.forEach(input => {
-                if (!input.value) {
-                    isValid = false;
-                    input.classList.add('border-red-500');
-                } else {
-                    input.classList.remove('border-red-500');
-                }
-            });
+        // Helper to show error
+        const showError = (element, message) => {
+            // Remove existing error first
+            const parent = element.closest('div');
+            const existingError = parent.querySelector('.text-error');
+            if(existingError) existingError.remove();
 
-            // Validate Jenis Kelamin (Radio)
-            const jkContainer = document.getElementById('jk-container');
+            // Add error class to input
+            if(element.classList.contains('select2-hidden-accessible')) {
+                 // For select2
+                 const selection = parent.querySelector('.select2-selection');
+                 if(selection) selection.style.borderColor = '#ef4444';
+            } else {
+                element.classList.add('input-error');
+            }
+
+            // Append Validation Message
+            const msg = document.createElement('p');
+            msg.className = 'text-error';
+            msg.innerText = message;
+            
+            // Handle placement for Select2 or Radio
+            if (element.type === 'radio') {
+                 // Append to container
+                 const container = document.getElementById('jk-container');
+                 container.parentElement.appendChild(msg);
+            } else if(element.classList.contains('select2-hidden-accessible')) {
+                 parent.appendChild(msg);
+            } else {
+                 element.parentElement.appendChild(msg);
+            }
+        };
+
+        // Helper to clear error
+        const clearError = (element) => {
+             // Handle Radio Buttons
+             if (element.type === 'radio' && element.name === 'jenis_kelamin') {
+                 const container = document.getElementById('jk-container');
+                 container.classList.remove('bg-red-50', 'border', 'border-red-300');
+                 const existingError = container.parentElement.querySelector('.text-error');
+                 if(existingError) existingError.remove();
+                 return;
+             }
+
+             const parent = element.closest('div');
+             const existingError = parent.querySelector('.text-error');
+             if(existingError) existingError.remove();
+
+             if(element.classList.contains('select2-hidden-accessible')) {
+                 const selection = parent.querySelector('.select2-selection');
+                 if(selection) selection.style.borderColor = ''; // Reset
+            } else {
+                element.classList.remove('input-error');
+            }
+        };
+
+        // Live Validation Listeners
+        const inputs = step1.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => clearError(input));
+            input.addEventListener('change', () => clearError(input));
+            // Special for Select2
+            if(input.tagName === 'SELECT') {
+                 $(input).on('select2:select', function (e) { clearError(input); });
+            }
+        });
+
+        btnNext.addEventListener('click', () => {
+            let isValid = true;
+            let firstInvalid = null;
+
+            // 1. Validate Nama (Text)
+            const nama = step1.querySelector('input[name="nama"]');
+            if(!nama.value.trim()) {
+                isValid = false;
+                showError(nama, 'Nama Lengkap wajib diisi');
+                if(!firstInvalid) firstInvalid = nama;
+            }
+
+            // 2. Validate Jenis Kelamin (Radio)
             const jkChecked = step1.querySelector('input[name="jenis_kelamin"]:checked');
+            const jkContainer = document.getElementById('jk-container');
+            // Reset radio container style
+            jkContainer.classList.remove('bg-red-50', 'border', 'border-red-300');
+            // Remove old error msg
+            const jkParent = jkContainer.parentElement;
+            const jkError = jkParent.querySelector('.text-error');
+            if(jkError) jkError.remove();
 
             if (!jkChecked) {
                 isValid = false;
                 jkContainer.classList.add('bg-red-50', 'border', 'border-red-300');
-            } else {
-                jkContainer.classList.remove('bg-red-50', 'border', 'border-red-300');
+                const msg = document.createElement('p');
+                msg.className = 'text-error';
+                msg.innerText = 'Pilih salah satu jenis kelamin';
+                jkParent.appendChild(msg);
+                if(!firstInvalid) firstInvalid = jkContainer;
+            }
+
+            // 3. Validate Umur (Number)
+            const umur = step1.querySelector('input[name="umur"]');
+            if(!umur.value) {
+                isValid = false;
+                showError(umur, 'Umur wajib diisi');
+                if(!firstInvalid) firstInvalid = umur;
+            } else if(parseInt(umur.value) < 17 || parseInt(umur.value) > 100) {
+                 isValid = false;
+                 showError(umur, 'Umur harus antara 17 - 100 tahun');
+                 if(!firstInvalid) firstInvalid = umur;
+            }
+
+            // 4. Validate Pendidikan (Select)
+            const pendidikan = step1.querySelector('select[name="pendidikan"]');
+            if(!pendidikan.value) {
+                isValid = false;
+                showError(pendidikan, 'Silakan pilih pendidikan terakhir');
+                if(!firstInvalid) firstInvalid = pendidikan;
+            }
+
+            // 5. Validate Instansi (Select2)
+            const instansi = step1.querySelector('select[name="instansi"]');
+            if(!instansi.value) {
+                isValid = false;
+                showError(instansi, 'Silakan pilih atau cari instansi Anda');
+                if(!firstInvalid) firstInvalid = instansi;
+            }
+
+            // 6. Validate Pekerjaan (Select)
+            const pekerjaan = step1.querySelector('select[name="pekerjaan"]');
+             if(!pekerjaan.value) {
+                isValid = false;
+                showError(pekerjaan, 'Silakan pilih pekerjaan Anda');
+                if(!firstInvalid) firstInvalid = pekerjaan;
             }
 
             if (isValid) {
@@ -314,7 +442,7 @@
                 stepLine.classList.add('w-full');
                 stepDot2.classList.remove('bg-gray-300');
                 stepDot2.classList.add('bg-[#de1d5e]');
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 // Enable required on radio buttons now that they are visible
                 document.querySelectorAll('.survey-radio').forEach(r => r.required = true);
@@ -325,7 +453,11 @@
                 });
                 updateProgress(); // Initial check
             } else {
-                alert('Mohon lengkapi semua data diri terlebih dahulu.');
+                 if(firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }
+                 // Fallback alert to ensure user notices
+                 alert('Mohon lengkapi bagian yang ditandai merah.');
             }
         });
 

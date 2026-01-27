@@ -182,6 +182,61 @@
             <p class="mt-4 text-gray-500">Transparansi data responden yang telah berpartisipasi.</p>
         </div>
 
+        <!-- NEW SECTION: Unit NRR Performance Grid -->
+        <div id="unit-performance-grid" class="mb-20">
+             <div class="flex flex-col md:flex-row justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-900 mb-2">Indeks Kepuasan Pelayanan Tim Kerja</h2>
+                    <p class="text-gray-500">Nilai Rata-rata Unsur (NRR) per Unit - Periode <?= $currentYear ?></p>
+                </div>
+                 <div class="mt-4 md:mt-0">
+                    <span class="px-4 py-2 bg-blue-50 text-[#0e4c92] text-sm font-bold rounded-full border border-blue-100">
+                        Total Unit: <?= count(json_decode($gridUnitData)) ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <?php 
+                // Decode data for loop
+                $units = json_decode($gridUnitData, true);
+                if (!empty($units)):
+                    foreach($units as $index => $u):
+                ?>
+                <div class="bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group hover:shadow-2xl transition-all">
+                    <!-- Top Ribbon -->
+                    <div class="absolute top-0 left-0 w-full h-1 bg-<?= $u['chart_color'] ?>-500"></div>
+
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-3/4">
+                            <h3 class="text-lg font-bold text-gray-800 line-clamp-2 leading-tight" title="<?= $u['nama'] ?>">
+                                <?= $u['nama'] ?>
+                            </h3>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Mutu</span>
+                            <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-<?= $u['mutu_color'] ?>-100 text-<?= $u['mutu_color'] ?>-600 font-black text-xl">
+                                <?= $u['mutu'] ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div id="chart-unit-<?= $index ?>" class="w-full h-48"></div>
+
+                    <!-- Footer Info -->
+                    <div class="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center text-xs">
+                        <div class="text-gray-400 font-medium">Skor IKM</div>
+                        <div class="text-lg font-black text-gray-800"><?= $u['ikm'] ?></div>
+                    </div>
+                </div>
+                <?php endforeach; else: ?>
+                    <div class="col-span-3 text-center py-10 text-gray-400">Belum ada data unit untuk tahun <?= $currentYear ?></div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Chart Card 1 -->
             <div class="bg-white p-8 rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-50">
@@ -253,12 +308,104 @@
     const rawPendidikan = <?= $chartPendidikan ?>;
     const rawPekerjaan = <?= $chartPekerjaan ?>;
     const rawUsia = <?= $chartUsia ?>;
+    const gridUnitData = <?= $gridUnitData ?>;
 
     // --- Helper Functions ---
     const getLabels = (data, key) => data.map(item => item[key]);
     const getValues = (data, key) => data.map(item => parseInt(item[key]));
 
-    // --- CHART 1: GENDER (Donut) ---
+    // --- RENDER GRID CHARTS ---
+    if (gridUnitData && gridUnitData.length > 0) {
+        // Color Map for Tailwind classes
+        const colorMap = {
+            'emerald': '#10b981', 'blue': '#3b82f6', 'yellow': '#f59e0b', 'red': '#ef4444',
+            'gray': '#9ca3af', 'violet': '#8b5cf6', 'amber': '#f59e0b', 'rose': '#f43f5e',
+            'cyan': '#06b6d4', 'fuchsia': '#d946ef', 'lime': '#84cc16', 'sky': '#0ea5e9',
+            'orange': '#f97316', 'teal': '#14b8a6', 'indigo': '#6366f1', 'pink': '#ec4899'
+        };
+
+        gridUnitData.forEach((unit, index) => {
+            const chartData = unit.nrr_values.map(v => parseFloat(v));
+            const categories = unit.unsur_keys; // U1, U2...
+            const themeColor = colorMap[unit.chart_color] || '#3b82f6'; // Use distinct chart_color
+
+            const options = {
+                series: [{
+                    name: 'NRR',
+                    data: chartData
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 200,
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, sans-serif'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        columnWidth: '60%',
+                        distributed: false, // Unified color for this unit
+                        dataLabels: {
+                            position: 'top', 
+                        },
+                    }
+                },
+                colors: [themeColor], // Use the unit's theme color
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val) {
+                        return val.toFixed(1);
+                    },
+                    offsetY: -15,
+                    style: {
+                        fontSize: '10px',
+                        colors: ["#64748b"]
+                    }
+                },
+                xaxis: {
+                    categories: categories,
+                    labels: {
+                        style: {
+                            fontSize: '10px',
+                            fontWeight: 600
+                        }
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    max: 4,
+                    tickAmount: 4,
+                    labels: {
+                        show: false
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                grid: {
+                    show: false,
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    } 
+                },
+                legend: { show: false },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " (Skala 4)";
+                        }
+                    }
+                }
+            };
+
+            new ApexCharts(document.querySelector("#chart-unit-" + index), options).render();
+        });
+    }
+
+    // --- EXISTING DEMOGRAPHIC CHARTS ---
     const genderOptions = {
         series: getValues(rawGender, 'total'),
         labels: rawGender.map(item => item.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'),

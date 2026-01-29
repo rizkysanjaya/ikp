@@ -236,6 +236,62 @@
             <p class="mt-4 text-gray-500">Transparansi data responden yang telah berpartisipasi.</p>
         </div>
 
+        <!-- NEW: Global IKM Score Card -->
+        <div class="max-w-4xl mx-auto mb-20">
+            <div class="bg-white rounded-3xl p-8 md:p-12 shadow-2xl shadow-blue-900/10 border border-blue-100/50 relative overflow-hidden text-center group hover:shadow-blue-900/20 transition-all duration-500">
+                <!-- Decoration -->
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600"></div>
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-b from-transparent to-blue-50/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+                <h3 class="text-sm md:text-base font-bold text-blue-500 uppercase tracking-widest mb-3 relative z-10">
+                    Indeks Kepuasan Masyarakat (IKM)
+                </h3>
+                <h2 class="text-3xl md:text-5xl font-black text-gray-900 mb-10 relative z-10 leading-tight">
+                    Kantor Regional III BKN
+                </h2>
+
+                <div class="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 relative z-10">
+                    <!-- Score -->
+                    <div class="relative">
+                        <div class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-cyan-400 drop-shadow-sm">
+                            <?= $globalStats['ikm_formatted'] ?>
+                        </div>
+                        <div class="text-sm font-bold text-gray-400 mt-2">Skala 100</div>
+                    </div>
+                    
+                    <!-- Separator -->
+                    <div class="hidden md:block w-px h-32 bg-gray-200"></div>
+
+                    <!-- Mutu -->
+                    <div class="text-center md:text-left space-y-6">
+                        <div>
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider block mb-1">Mutu Pelayanan</span>
+                            <div class="flex items-center gap-3 justify-center md:justify-start">
+                                <span class="text-5xl font-black text-<?= $globalStats['class_color'] ?>-500">
+                                    <?= $globalStats['mutu'] ?>
+                                </span>
+                                <span class="px-3 py-1 rounded-full bg-<?= $globalStats['class_color'] ?>-100 text-<?= $globalStats['class_color'] ?>-700 text-sm font-bold border border-<?= $globalStats['class_color'] ?>-200">
+                                    <?= $globalStats['ket'] ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-xs font-bold uppercase tracking-wider block mb-1">Total Partisipan</span>
+                            <div class="text-3xl font-bold text-gray-800">
+                                <?= number_format($globalStats['total_responden'], 0, ',', '.') ?>
+                                <span class="text-base text-gray-400 font-medium ml-1">Orang</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-6 border-t border-gray-100 inline-block px-8">
+                    <span class="text-gray-400 text-sm font-medium bg-gray-50 px-3 py-1 rounded-full">Periode: Tahun <?= $currentYear ?></span>
+                </div>
+            </div>
+        </div>
+
         <!-- NEW SECTION: Unit NRR Performance Grid -->
         <div id="unit-performance-grid" class="mb-20">
              <div class="flex flex-col md:flex-row justify-between items-end mb-10">

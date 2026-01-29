@@ -70,6 +70,50 @@
         </div>
     </div>
 
+    <!-- NEW: Global IKM Score Banner -->
+    <div class="mb-12">
+        <div class="bg-gradient-to-r from-white to-blue-50/50 rounded-3xl p-8 border border-blue-100 shadow-xl shadow-blue-900/5 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 group">
+             <!-- Background Pattern -->
+            <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.05]"></div>
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+            
+            <div class="text-center md:text-left relative z-10 md:w-1/2">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-3">
+                    Laporan Akumulatif <?= $currentYear ?>
+                </span>
+                <h2 class="text-3xl font-black text-gray-900 leading-tight mb-2">
+                    Skor IKM Global
+                </h2>
+                <p class="text-gray-500 text-sm">
+                    Nilai rata-rata kepuasan masyarakat dari seluruh unit layanan di Kantor Regional III BKN.
+                </p>
+            </div>
+
+            <div class="relative z-10 flex items-center justify-center md:justify-end gap-6 md:w-1/2">
+                <!-- Score -->
+                <div class="text-right">
+                     <span class="block text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
+                        <?= $globalStats['ikm_formatted'] ?>
+                    </span>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Skala 100</span>
+                </div>
+
+                <!-- Divider -->
+                <div class="w-px h-16 bg-gray-200"></div>
+
+                <!-- Grade -->
+                <div>
+                     <span class="block text-4xl font-black text-<?= $globalStats['class_color'] ?>-500">
+                        <?= $globalStats['mutu'] ?>
+                    </span>
+                    <span class="inline-block px-2 py-1 bg-<?= $globalStats['class_color'] ?>-50 text-<?= $globalStats['class_color'] ?>-700 text-xs font-bold rounded border border-<?= $globalStats['class_color'] ?>-100 mt-1">
+                        <?= $globalStats['ket'] ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Section Header & Legend -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 px-2">
         <div>

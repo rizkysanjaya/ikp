@@ -142,6 +142,9 @@
                             </svg>
                         </button>
                         <div x-show="activeMenu === 'settings'" x-transition class="pl-4 pr-2 space-y-1 pt-1 opacity-90">
+                            <a href="<?= base_url('admin/backup') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2.5"></span> Backup Database
+                            </a>
                             <a href="<?= base_url('admin/users') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2.5"></span> Manajemen User
                             </a>
@@ -201,6 +204,31 @@
             </header>
 
             <main class="flex-1 overflow-y-auto p-6 lg:p-8 scroll-smooth">
+                <!-- Global Alerts -->
+                <?php if (session()->getFlashdata('success')) : ?>
+                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm relative z-30">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="font-medium"><?= session()->getFlashdata('success') ?></span>
+                        </div>
+                        <button @click="show = false" class="text-emerald-400 hover:text-emerald-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (session()->getFlashdata('error')) : ?>
+                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm relative z-30">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="font-medium"><?= session()->getFlashdata('error') ?></span>
+                        </div>
+                        <button @click="show = false" class="text-red-400 hover:text-red-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                <?php endif; ?>
+
                 <?= $this->renderSection('content') ?>
             </main>
         </div>

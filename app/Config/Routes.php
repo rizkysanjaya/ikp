@@ -20,6 +20,8 @@ $routes->group('dashboard', ['namespace' => 'App\Controllers\Admin', 'filter' =>
 
 // Admin
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'auth'], function ($routes) {
+    $routes->get('backup', 'Backup::index'); // Direct backup route
+    
     // Menu
     $routes->group('', ['namespace' => 'App\Controllers\Admin\Menu'], function ($routes) {
         $routes->get('about', 'About::index');

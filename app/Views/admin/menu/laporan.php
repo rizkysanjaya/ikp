@@ -65,6 +65,7 @@
                         </div>
                         <select name="layanan_id" required class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0e4c92] focus:border-[#0e4c92] transition-colors bg-gray-50 focus:bg-white appearance-none">
                             <option value="">-- Pilih Unit Layanan --</option>
+                            <option value="all" <?= $filters['layanan_id'] == 'all' ? 'selected' : '' ?>>Semua Unit (Laporan Global)</option>
                             <?php foreach ($layanan as $l): ?>
                                 <option value="<?= $l->id ?>" <?= $filters['layanan_id'] == $l->id ? 'selected' : '' ?>><?= esc($l->nama_layanan) ?></option>
                             <?php endforeach; ?>

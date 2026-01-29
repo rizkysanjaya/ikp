@@ -96,70 +96,68 @@
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <!-- Unit Template Helper -->
         <?php 
-        $units = [
-            [
-                'url' => 'survey/sidigi',
+        // Visual Configuration Map (Key = Kode Layanan)
+        // Maps DB Data to UI Elements (Icon, Color, Description) which are not in DB
+        $visualConfig = [
+            'KL001' => [
                 'color' => 'blue',
                 'icon' => 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-                'title' => 'Sistem Informasi & Digitalisasi',
                 'desc' => 'Layanan terkait infrastruktur IT, aplikasi, dan digitalisasi data kepegawaian.'
             ],
-            [
-                'url' => 'survey/mutasi',
+            'KL002' => [
                 'color' => 'emerald',
                 'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z',
-                'title' => 'Pengangkatan & Mutasi',
                 'desc' => 'Layanan administrasi pengangkatan CPNS/PNS dan mutasi kepegawaian.'
             ],
-            [
-                'url' => 'survey/status',
+            'KL003' => [
                 'color' => 'amber',
                 'icon' => 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1',
-                'title' => 'Status & Pemberhentian',
                 'desc' => 'Layanan terkait status kepegawaian dan proses pemberhentian/pensiun.'
             ],
-            [
-                'url' => 'survey/manajemen',
+            'KL004' => [
                 'color' => 'purple',
                 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-                'title' => 'Pembinaan Manajemen ASN',
                 'desc' => 'Layanan pengembangan kompetensi, kinerja, dan disiplin ASN.'
             ],
-            [
-                'url' => 'survey/pengawasan',
+            'KL005' => [
                 'color' => 'rose',
                 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-                'title' => 'Pengawasan & Pengendalian',
                 'desc' => 'Layanan pengawasan norma, standar, prosedur, dan kriteria kepegawaian.'
             ],
-             [
-                'url' => 'survey/narasumber',
+            'KL006' => [
                 'color' => 'orange',
                 'icon' => 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z',
-                'title' => 'Narasumber',
                 'desc' => 'Layanan penilaian kinerja dan kepuasan terhadap narasumber kegiatan.'
             ]
         ];
         
-        // Color Map for dynamic classes (Tailwind needs full class names often, but we can interpolate safely if standard colors)
-        // Adjusting specific hexes/classes for "Premium" look
+        // Fallback for new units not in config
+        $defaultConfig = [
+            'color' => 'gray', 
+            'icon'  => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+            'desc'  => 'Silakan klik untuk memulai survei pada layanan ini.'
+        ];
         ?>
 
-        <?php foreach($units as $u): ?>
-        <a href="<?= base_url($u['url']) ?>" class="group relative bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-<?= $u['color'] ?>-500/20 transition-all duration-300 hover:-translate-y-2 overflow-hidden border border-gray-100 p-8 flex flex-col items-start z-10">
+        <?php foreach($units as $u): 
+            $conf = $visualConfig[$u->kode_layanan] ?? $defaultConfig;
+            // Generate friendly slug (e.g. "sistem-informasi-dan-digitalisasi")
+            $slug = url_title($u->nama_layanan, '-', true);
+        ?>
+        <a href="<?= base_url('survey/' . $slug) ?>" class="group relative bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-<?= $conf['color'] ?>-500/20 transition-all duration-300 hover:-translate-y-2 overflow-hidden border border-gray-100 p-8 flex flex-col items-start z-10">
              <!-- Glow Background on Hover -->
-             <div class="absolute inset-0 bg-gradient-to-br from-<?= $u['color'] ?>-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+             <div class="absolute inset-0 bg-gradient-to-br from-<?= $conf['color'] ?>-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
             
-             <div class="w-16 h-16 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-<?= $u['color'] ?>-500 mb-6 group-hover:scale-110 group-hover:bg-<?= $u['color'] ?>-500 group-hover:text-white transition-all duration-300">
+             <div class="w-16 h-16 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-<?= $conf['color'] ?>-500 mb-6 group-hover:scale-110 group-hover:bg-<?= $conf['color'] ?>-500 group-hover:text-white transition-all duration-300">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $u['icon'] ?>"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $conf['icon'] ?>"></path>
                 </svg>
             </div>
 
-            <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-<?= $u['color'] ?>-600 transition-colors"><?= $u['title'] ?></h3>
-            <p class="text-sm text-gray-500 leading-relaxed mb-6 flex-grow"><?= $u['desc'] ?></p>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-<?= $conf['color'] ?>-600 transition-colors"><?= esc($u->nama_layanan) ?></h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-6 flex-grow"><?= $conf['desc'] ?></p>
             
-            <div class="inline-flex items-center text-sm font-bold text-<?= $u['color'] ?>-600 uppercase tracking-wide mt-auto">
+            <div class="inline-flex items-center text-sm font-bold text-<?= $conf['color'] ?>-600 uppercase tracking-wide mt-auto">
                 Mulai Survei
                 <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>

@@ -20,20 +20,10 @@ class Survey extends BaseController
             return redirect()->to('/');
         }
 
-        // 1. Map Slug to Kode Layanan
-        // You can add other mappings here as needed
-        $slugToKodeMap = [
-            'sidigi'     => 'KL001',
-            'mutasi'     => 'KL002',
-            'status'     => 'KL003',
-            'manajemen'  => 'KL004',
-            'pengawasan' => 'KL005',
-            'narasumber' => 'KL006',
-        ];
+        // 1. Get Layanan Data (Dynamic Lookup)
+        $layanan = $this->getLayananBySlug($slug);
 
-        $kodeLayanan = $slugToKodeMap[$slug] ?? null;
-
-        if (!$kodeLayanan) {
+        if (!$layanan) {
             return redirect()->to('/')->with('error', 'Unit layanan tidak ditemukan.');
         }
 
@@ -43,14 +33,7 @@ class Survey extends BaseController
         $pekerjaanModel = new RefPekerjaanModel();
         $pertanyaanModel = new RefPertanyaanModel();
         $jawabanModel = new RefJawabanModel();
-        $jenisLayananModel = new RefJenisLayananModel();
-
-        // 2. Get Layanan Data from DB
-        $layanan = $jenisLayananModel->where('kode_layanan', $kodeLayanan)->first();
-
-        if (!$layanan) {
-            return redirect()->to('/')->with('error', 'Data layanan belum tersedia.');
-        }
+        // RefJenisLayananModel already used in helper
 
         // Check if unit is active
         if ($layanan->is_active == 0) {
@@ -137,18 +120,7 @@ class Survey extends BaseController
 
         // 2. Ambil Data Layanan (untuk mendapatkan ID Layanan)
         $slug = $this->request->getPost('unit_slug');
-        $slugToKodeMap = [
-            'sidigi'     => 'KL001',
-            'mutasi' => 'KL002',
-            'status' => 'KL003',
-            'manajemen'  => 'KL004',
-            'pengawasan' => 'KL005',
-            'narasumber' => 'KL006',
-        ];
-        $kodeLayanan = $slugToKodeMap[$slug] ?? null;
-
-        $jenisLayananModel = new RefJenisLayananModel();
-        $layanan = $jenisLayananModel->where('kode_layanan', $kodeLayanan)->first();
+        $layanan = $this->getLayananBySlug($slug);
 
         if (!$layanan) {
             return redirect()->back()->with('error', 'Unit layanan tidak valid.');
@@ -196,5 +168,40 @@ class Survey extends BaseController
 
         // 5. Tampilkan Halaman Sukses
         return view('survey/success');
+    }
+
+    /**
+     * Helper to find layanan by Slug (Kode Layanan) or Name
+     * Matches Kode Layanan (exact) or Nama Layanan (slugified)
+     */
+    private function getLayananBySlug($slug)
+    {
+        $jenisLayananModel = new RefJenisLayananModel();
+        
+        // 1. Try finding by Kode Layanan (e.g. KL001)
+        $layanan = $jenisLayananModel->where('kode_layanan', $slug)->first();
+        if ($layanan) return $layanan;
+
+        // 2. Try finding by Name (e.g. 'sidigi' matches 'Sistem Informasi dan Digitalisasi')
+        // We have to iterate because we don't have a slug column
+        $allLayanan = $jenisLayananModel->where('is_active', 1)->findAll();
+        foreach ($allLayanan as $item) {
+            // Using url_title to generate slug from name (e.g. 'Sistem Informasi' -> 'sistem-informasi')
+            // Then removing '-' to support 'sisteminformasi' or just 'sidigi' if close? 
+            // Actually, let's stick to url_title standard
+            $generatedSlug = url_title($item->nama_layanan, '-', true);
+            if ($generatedSlug === $slug) {
+                return $item;
+            }
+        }
+        
+        // 3. Fallback: check if slug is contained in the name (e.g. 'sidigi' might be a manual shortname not in DB?)
+        // The previous hardcoded map mapped 'sidigi' => 'KL001'.
+        // To support 'sidigi' without hardcoding, the user must update the unit name or code.
+        // OR we just support exact code and exact standard slug. 
+        // For 'sidigi', if 'KL001' is capable of being accessed via 'sidigi', the system won't know unless 'sidigi' is in the name.
+        // Let's assume the user will access via 'KL001' or 'sistem-informasi-dan-digitalisasi'.
+        
+        return null;
     }
 }

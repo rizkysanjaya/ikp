@@ -139,8 +139,12 @@ class Home extends BaseController
             ];
         }
 
+        // Active Units for Landing Page Selection
+        $activeUnits = $layananModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll();
+
         $data = [
             'title' => 'Portal Survei Kepuasan Masyarakat',
+            'units' => $activeUnits, // Pass active units to View
             // Kirim data ke View dalam format JSON agar mudah dibaca JS
             'chartGender'     => json_encode($genderData),
             'chartPendidikan' => json_encode($pendidikanData),

@@ -188,6 +188,7 @@
                         </svg></button>
                 </div>
                 <form action="<?= base_url('admin/master/instansi/save') ?>" method="post" class="p-6 space-y-4">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="original_id" x-model="form.original_id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kode Instansi</label>

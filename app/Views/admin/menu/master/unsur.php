@@ -89,6 +89,7 @@
                 </div>
 
                 <form action="<?= base_url('admin/master/unsur/update') ?>" method="post" class="p-6 space-y-4">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="id" x-model="form.id">
 
                     <div>

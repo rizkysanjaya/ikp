@@ -66,12 +66,7 @@
                  </div>
                 <span class="font-bold text-gray-700 mr-1"><?= number_format($unit['total_responden']) ?></span> <span class="text-xs">Ulasan</span>
             </div>
-            <a href="#" class="<?= $theme['text'] ?> font-bold text-xs flex items-center hover:underline group-hover:translate-x-1 transition-transform">
-                Lihat Detail
-                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                </svg>
-            </a>
+
         </div>
     </div>
 <?php endforeach; ?>

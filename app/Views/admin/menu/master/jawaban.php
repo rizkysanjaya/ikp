@@ -151,6 +151,7 @@
                         </svg></button>
                 </div>
                 <form action="<?= base_url('admin/master/jawaban/save') ?>" method="post" class="p-6 space-y-4">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="id" x-model="form.id">
                     <div x-show="form.soal_id">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Unsur Pelayanan</label>

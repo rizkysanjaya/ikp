@@ -121,6 +121,7 @@
                         </svg></button>
                 </div>
                 <form action="<?= base_url('admin/master/unit/save') ?>" method="post" class="p-6 space-y-4">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="id" x-model="form.id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kode Layanan</label>

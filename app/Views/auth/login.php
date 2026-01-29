@@ -31,6 +31,7 @@
         <?php endif; ?>
 
         <form class="mt-8 space-y-6" action="<?= base_url('login') ?>" method="POST">
+            <?= csrf_field() ?>
             <div class="rounded-md shadow-sm -space-y-px">
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>

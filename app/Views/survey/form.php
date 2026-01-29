@@ -99,6 +99,7 @@
             </div>
 
             <form action="<?= base_url('survey/submit') ?>" method="post" id="surveyForm">
+                <?= csrf_field() ?>
                 <input type="hidden" name="unit_slug" value="<?= esc($slug) ?>">
 
                 <!-- PART 1: DATA RESPONDEN -->

@@ -12,7 +12,9 @@
         body {
             font-family: 'Merriweather', serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
@@ -72,8 +74,6 @@
                 <div class="flex flex-col md:items-end space-y-4">
                     <div class="flex space-x-6 text-sm font-medium text-gray-400">
                         <a href="https://kanreg3.bkn.go.id" target="_blank" class="hover:text-blue-400 transition-colors">Website Resmi</a>
-                        <a href="#" class="hover:text-blue-400 transition-colors">Bantuan</a>
-                        <a href="#" class="hover:text-blue-400 transition-colors">Kebijakan Privasi</a>
                     </div>
                 </div>
             </div>

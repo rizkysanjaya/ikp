@@ -1,8 +1,53 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<!-- Floating Navigation Sidebar -->
+<div x-data="{ activeSection: 'home' }" 
+     @scroll.window="
+        const home = document.getElementById('home').getBoundingClientRect();
+        const units = document.getElementById('unit-layanan').getBoundingClientRect();
+        const stats = document.getElementById('statistics').getBoundingClientRect();
+        const offset = window.innerHeight / 3;
+
+        if (stats.top < offset) { activeSection = 'statistics'; }
+        else if (units.top < offset) { activeSection = 'units'; }
+        else { activeSection = 'home'; }
+     "
+     class="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 hidden md:flex flex-col gap-4">
+    
+    <!-- Home Dot -->
+    <a href="#home" @click.prevent="document.getElementById('home').scrollIntoView({behavior: 'smooth'})" 
+       class="group flex items-center justify-end">
+        <span class="mr-3 px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Beranda
+        </span>
+        <div :class="activeSection === 'home' ? 'bg-blue-600 scale-125 ring-4 ring-blue-600/20' : 'bg-gray-300 hover:bg-blue-400'" 
+             class="w-3 h-3 rounded-full transition-all duration-300"></div>
+    </a>
+
+    <!-- Units Dot -->
+    <a href="#unit-layanan" @click.prevent="document.getElementById('unit-layanan').scrollIntoView({behavior: 'smooth'})"
+       class="group flex items-center justify-end">
+        <span class="mr-3 px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Survei Layanan
+        </span>
+        <div :class="activeSection === 'units' ? 'bg-blue-600 scale-125 ring-4 ring-blue-600/20' : 'bg-gray-300 hover:bg-blue-400'" 
+             class="w-3 h-3 rounded-full transition-all duration-300"></div>
+    </a>
+
+    <!-- Statistics Dot -->
+    <a href="#statistics" @click.prevent="document.getElementById('statistics').scrollIntoView({behavior: 'smooth'})"
+       class="group flex items-center justify-end">
+        <span class="mr-3 px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Statistik IKM
+        </span>
+        <div :class="activeSection === 'statistics' ? 'bg-blue-600 scale-125 ring-4 ring-blue-600/20' : 'bg-gray-300 hover:bg-blue-400'" 
+             class="w-3 h-3 rounded-full transition-all duration-300"></div>
+    </a>
+</div>
+
 <!-- Hero Section -->
-<div class="relative bg-[#0b1120] overflow-hidden">
+<div id="home" class="relative bg-[#0b1120] overflow-hidden">
     <!-- Background Effects -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#0e4c92] opacity-20 blur-[100px]"></div>
@@ -23,7 +68,7 @@
                 Platform resmi survei digital <span class="text-white font-semibold">Kantor Regional III BKN Bandung</span>. Partisipasi Anda adalah kunci transformasi pelayanan publik kami.
             </p>
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="#unit-layanan" class="inline-flex items-center justify-center bg-gradient-to-r from-[#0e4c92] to-[#0a386e] text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-blue-900/50 hover:shadow-blue-600/50 hover:-translate-y-1 transition-all duration-300 group border border-blue-500/30">
+                <a href="#unit-layanan" @click.prevent="document.getElementById('unit-layanan').scrollIntoView({behavior: 'smooth'})" class="inline-flex items-center justify-center bg-gradient-to-r from-[#0e4c92] to-[#0a386e] text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-blue-900/50 hover:shadow-blue-600/50 hover:-translate-y-1 transition-all duration-300 group border border-blue-500/30">
                     <span>Mulai Survei Sekarang</span>
                     <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -225,7 +270,7 @@
 </div>
 
 <!-- Stats Section with Pattern -->
-<div class="bg-white py-24 relative overflow-hidden border-t border-gray-100">
+<div id="statistics" class="bg-white py-24 relative overflow-hidden border-t border-gray-100">
     <!-- Pattern -->
     <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#0e4c92_1px,transparent_1px)] [background-size:16px_16px]"></div>
     

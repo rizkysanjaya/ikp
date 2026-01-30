@@ -10,6 +10,32 @@ class Backup extends BaseController
     {
         $db = \Config\Database::connect();
         $tables = $db->listTables();
+        $stats = [];
+        $totalRows = 0;
+
+        foreach ($tables as $table) {
+            $count = $db->table($table)->countAll();
+            $stats[] = [
+                'name' => $table,
+                'rows' => $count
+            ];
+            $totalRows += $count;
+        }
+
+        $data = [
+            'title' => 'Backup Database',
+            'stats' => $stats,
+            'totalRows' => $totalRows,
+            'dbName' => $db->database
+        ];
+
+        return view('admin/backup', $data);
+    }
+
+    public function download()
+    {
+        $db = \Config\Database::connect();
+        $tables = $db->listTables();
         $date = date('Y-m-d_H-i-s');
         $filename = 'backup_ikp_' . $date . '.sql';
 

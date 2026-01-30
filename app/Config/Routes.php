@@ -20,7 +20,8 @@ $routes->group('dashboard', ['namespace' => 'App\Controllers\Admin', 'filter' =>
 
 // Admin
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'auth'], function ($routes) {
-    $routes->get('backup', 'Backup::index'); // Direct backup route
+    $routes->get('backup', 'Backup::index');
+    $routes->get('backup/download', 'Backup::download'); // New Download Route
     
     // Menu
     $routes->group('', ['namespace' => 'App\Controllers\Admin\Menu'], function ($routes) {

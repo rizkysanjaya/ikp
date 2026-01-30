@@ -42,7 +42,7 @@ class Pekerjaan extends BaseController
             $message = 'Data pekerjaan baru berhasil ditambahkan.';
         }
 
-        return redirect()->to('admin/menu/master/pekerjaan')->with('success', $message);
+        return redirect()->to('admin/master/pekerjaan')->with('success', $message);
     }
 
     public function toggle($id)
@@ -54,16 +54,16 @@ class Pekerjaan extends BaseController
             $newStatus = $item->is_active == 1 ? 0 : 1;
             $model->update($id, ['is_active' => $newStatus]);
             $statusText = $newStatus == 1 ? 'diaktifkan' : 'dinonaktifkan';
-            return redirect()->to('admin/menu/master/pekerjaan')->with('success', "Data pekerjaan berhasil $statusText.");
+            return redirect()->to('admin/master/pekerjaan')->with('success', "Data pekerjaan berhasil $statusText.");
         }
 
-        return redirect()->to('admin/menu/master/pekerjaan')->with('errors', ['Data tidak ditemukan.']);
+        return redirect()->to('admin/master/pekerjaan')->with('errors', ['Data tidak ditemukan.']);
     }
 
     public function delete($id)
     {
         $model = new RefPekerjaanModel();
         $model->delete($id);
-        return redirect()->to('admin/menu/master/pekerjaan')->with('success', 'Data pekerjaan berhasil dihapus.');
+        return redirect()->to('admin/master/pekerjaan')->with('success', 'Data pekerjaan berhasil dihapus.');
     }
 }

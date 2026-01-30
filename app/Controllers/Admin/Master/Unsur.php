@@ -35,6 +35,6 @@ class Unsur extends BaseController
 
         $model->update($id, $data);
 
-        return redirect()->to('admin/menu/master/unsur')->with('success', 'Data unsur pelayanan berhasil diperbarui.');
+        return redirect()->to('admin/master/unsur')->with('success', 'Data unsur pelayanan berhasil diperbarui.');
     }
 }

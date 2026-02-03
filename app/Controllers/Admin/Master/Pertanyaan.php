@@ -39,9 +39,18 @@ class Pertanyaan extends BaseController
         $id = $this->request->getPost('id');
 
         if (!$this->validate([
-            'jenis_layanan_id' => 'required',
-            'unsur_id' => 'required',
-            'pertanyaan' => 'required',
+            'jenis_layanan_id' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Unit layanan wajib dipilih.']
+            ],
+            'unsur_id' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Unsur pelayanan wajib dipilih.']
+            ],
+            'pertanyaan' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Pertanyaan wajib diisi.']
+            ],
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }

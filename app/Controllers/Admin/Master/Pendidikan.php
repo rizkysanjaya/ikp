@@ -25,12 +25,25 @@ class Pendidikan extends BaseController
         $id = $this->request->getPost('id');
 
         $rules = [
-            'nama_pendidikan' => 'required',
+            'nama_pendidikan' => [
+                'rules'  => 'required|max_length[100]',
+                'errors' => [
+                    'required'   => 'Nama tingkat pendidikan wajib diisi.',
+                    'max_length' => 'Nama tingkat pendidikan maksimal 100 karakter.'
+                ]
+            ]
         ];
 
         // Only validate ID uniqueness if creating a new record
         if (empty($originalId)) {
-            $rules['id'] = 'required|is_unique[ref_pendidikan.id]';
+            $rules['id'] = [
+                'rules'  => 'required|max_length[10]|is_unique[ref_pendidikan.id]',
+                'errors' => [
+                    'required'   => 'Kode pendidikan wajib diisi.',
+                    'max_length' => 'Kode pendidikan maksimal 10 karakter.',
+                    'is_unique'  => 'Kode pendidikan sudah digunakan.',
+                ]
+            ];
         }
 
         if (!$this->validate($rules)) {

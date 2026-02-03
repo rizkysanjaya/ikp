@@ -368,10 +368,10 @@
 
 <script>
     // Inject Data for External Scripts
-    window.ReportStats = <?= ($reportData && !empty($reportData['stats'])) ? json_encode($reportData['stats']) : 'null' ?>;
-    window.UnsurData = <?= !empty($unsur) ? json_encode($unsur) : '[]' ?>;
-    window.RespondentsData = <?= ($reportData && !empty($reportData['respondents'])) ? json_encode($reportData['respondents']) : '[]' ?>;
-    window.ChartOptions = <?= !empty($chartOptions) ? json_encode($chartOptions) : '{}' ?>;
+    window.ReportStats = <?= ($reportData && !empty($reportData['stats'])) ? json_encode($reportData['stats'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : 'null' ?>;
+    window.UnsurData = <?= !empty($unsur) ? json_encode($unsur, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : '[]' ?>;
+    window.RespondentsData = <?= ($reportData && !empty($reportData['respondents'])) ? json_encode($reportData['respondents'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : '[]' ?>;
+    window.ChartOptions = <?= !empty($chartOptions) ? json_encode($chartOptions, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : '{}' ?>;
 </script>
 
 <!-- External Export Scripts -->

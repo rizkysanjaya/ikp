@@ -24,7 +24,13 @@ class Unsur extends BaseController
         $id = $this->request->getPost('id');
 
         if (!$this->validate([
-            'nama_unsur' => 'required',
+            'nama_unsur' => [
+                'rules'  => 'required|max_length[100]',
+                'errors' => [
+                    'required'   => 'Nama unsur pelayanan wajib diisi.',
+                    'max_length' => 'Nama unsur pelayanan maksimal 100 karakter.'
+                ]
+            ],
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }

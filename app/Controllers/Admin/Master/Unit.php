@@ -24,8 +24,21 @@ class Unit extends BaseController
         $id = $this->request->getPost('id');
 
         $rules = [
-            'kode_layanan' => 'required|is_unique[ref_jenis_layanan.kode_layanan,id,' . ($id ?? 0) . ']',
-            'nama_layanan' => 'required',
+            'kode_layanan' => [
+                'rules'  => 'required|max_length[5]|is_unique[ref_jenis_layanan.kode_layanan,id,' . ($id ?? 0) . ']',
+                'errors' => [
+                    'required'   => 'Kode layanan wajib diisi.',
+                    'max_length' => 'Kode layanan maksimal 5 karakter.',
+                    'is_unique'  => 'Kode layanan sudah digunakan, silakan pilih kode lain.'
+                ]
+            ],
+            'nama_layanan' => [
+                'rules'  => 'required|max_length[100]',
+                'errors' => [
+                    'required'   => 'Nama unit layanan wajib diisi.',
+                    'max_length' => 'Nama unit layanan maksimal 100 karakter.'
+                ]
+            ],
         ];
 
         if (!$this->validate($rules)) {

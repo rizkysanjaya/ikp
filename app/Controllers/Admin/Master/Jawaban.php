@@ -44,9 +44,24 @@ class Jawaban extends BaseController
         $id = $this->request->getPost('id');
 
         if (!$this->validate([
-            'soal_id' => 'required',
-            'label_jawaban' => 'required',
-            'bobot_nilai' => 'required|numeric',
+            'soal_id' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Pertanyaan wajib dipilih.']
+            ],
+            'label_jawaban' => [
+                'rules'  => 'required|max_length[255]',
+                'errors' => [
+                    'required'   => 'Label jawaban wajib diisi.',
+                    'max_length' => 'Label jawaban maksimal 255 karakter.'
+                ]
+            ],
+            'bobot_nilai' => [
+                'rules'  => 'required|numeric',
+                'errors' => [
+                    'required' => 'Bobot nilai wajib diisi.',
+                    'numeric'  => 'Bobot nilai harus berupa angka.'
+                ]
+            ],
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }

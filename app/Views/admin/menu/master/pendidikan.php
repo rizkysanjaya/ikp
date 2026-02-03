@@ -2,9 +2,13 @@
 
 <?= $this->section('content') ?>
 <div x-data="{ 
-    showModal: false, 
-    isEdit: false,
-    form: { original_id: '', id: '', nama_pendidikan: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    isEdit: <?= old('original_id') ? 'true' : 'false' ?>,
+    form: { 
+        original_id: '<?= old('original_id') ?>', 
+        id: '<?= old('id') ?>', 
+        nama_pendidikan: '<?= old('nama_pendidikan') ?>' 
+    },
     openAdd() {
         this.isEdit = false;
         this.form = { original_id: '', id: '', nama_pendidikan: '' };
@@ -121,11 +125,23 @@
                     <input type="hidden" name="original_id" x-model="form.original_id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kode Pendidikan</label>
-                        <input type="text" name="id" x-model="form.id" :readonly="isEdit" :class="{'bg-gray-100 cursor-not-allowed': isEdit}" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: kp-001">
+                        <input type="text" name="id" x-model="form.id" :readonly="isEdit" 
+                               :class="{'bg-gray-100 cursor-not-allowed': isEdit, 'border-red-500 ring-1 ring-red-500 bg-red-50': <?= session('errors.id') ? 'true' : 'false' ?>}" 
+                               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors" 
+                               placeholder="Contoh: kp-001" required>
+                        <?php if (session('errors.id')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.id') ?></p>
+                        <?php endif ?>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pendidikan</label>
-                        <input type="text" name="nama_pendidikan" x-model="form.nama_pendidikan" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: S1 / D4">
+                        <input type="text" name="nama_pendidikan" x-model="form.nama_pendidikan" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.nama_pendidikan') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>" 
+                               placeholder="Contoh: S1 / D4">
+                        <?php if (session('errors.nama_pendidikan')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.nama_pendidikan') ?></p>
+                        <?php endif ?>
                     </div>
                     <div class="pt-4 flex justify-end space-x-3">
                         <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">Batal</button>

@@ -6,9 +6,14 @@
     allData: <?= htmlspecialchars(json_encode($questions), ENT_QUOTES, 'UTF-8') ?>,
     currentPage: 1,
     itemsPerPage: 10,
-    showModal: false, 
-    isEdit: false,
-    form: { id: '', jenis_layanan_id: '', unsur_id: '', pertanyaan: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    isEdit: <?= old('id') ? 'true' : 'false' ?>,
+    form: { 
+        id: '<?= old('id') ?>', 
+        jenis_layanan_id: '<?= old('jenis_layanan_id') ?>', 
+        unsur_id: '<?= old('unsur_id') ?>', 
+        pertanyaan: '<?= old('pertanyaan') ?>' 
+    },
     
     get filteredData() {
         if (this.search === '') return this.allData;
@@ -161,21 +166,36 @@
                     <input type="hidden" name="id" x-model="form.id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Unit Layanan</label>
-                        <select name="jenis_layanan_id" x-model="form.jenis_layanan_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <select name="jenis_layanan_id" x-model="form.jenis_layanan_id" required 
+                                class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                                <?= session('errors.jenis_layanan_id') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
                             <option value="">-- Pilih Unit Layanan --</option>
                             <?php foreach ($layanan as $l): ?><option value="<?= $l->id ?>"><?= esc($l->nama_layanan) ?></option><?php endforeach; ?>
                         </select>
+                        <?php if (session('errors.jenis_layanan_id')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.jenis_layanan_id') ?></p>
+                        <?php endif ?>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Unsur Pelayanan</label>
-                        <select name="unsur_id" x-model="form.unsur_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <select name="unsur_id" x-model="form.unsur_id" required 
+                                class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                                <?= session('errors.unsur_id') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
                             <option value="">-- Pilih Unsur --</option>
                             <?php foreach ($unsur as $u): ?><option value="<?= $u->id ?>"><?= esc($u->kode_unsur) ?> - <?= esc($u->nama_unsur) ?></option><?php endforeach; ?>
                         </select>
+                        <?php if (session('errors.unsur_id')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.unsur_id') ?></p>
+                        <?php endif ?>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Pertanyaan</label>
-                        <textarea name="pertanyaan" x-model="form.pertanyaan" required rows="3" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent"></textarea>
+                        <textarea name="pertanyaan" x-model="form.pertanyaan" required rows="3" 
+                                  class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                                  <?= session('errors.pertanyaan') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>"></textarea>
+                        <?php if (session('errors.pertanyaan')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.pertanyaan') ?></p>
+                        <?php endif ?>
                     </div>
                     <div class="pt-4 flex justify-end space-x-3">
                         <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">Batal</button>

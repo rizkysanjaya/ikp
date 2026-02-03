@@ -2,9 +2,15 @@
 
 <?= $this->section('content') ?>
 <div x-data="{ 
-    showModal: false, 
-    isEdit: false, 
-    form: { id: '', name: '', email: '', username: '', password: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    isEdit: <?= old('id') ? 'true' : 'false' ?>, 
+    form: { 
+        id: '<?= old('id') ?>', 
+        name: '<?= old('name') ?>', 
+        email: '<?= old('email') ?>', 
+        username: '<?= old('username') ?>', 
+        password: '' 
+    },
     openAdd() {
         this.isEdit = false;
         this.form = { id: '', name: '', email: '', username: '', password: '' };
@@ -104,17 +110,32 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                        <input type="text" name="name" x-model="form.name" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <input type="text" name="name" x-model="form.name" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.name') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
+                        <?php if (session('errors.name')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.name') ?></p>
+                        <?php endif ?>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" name="email" x-model="form.email" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <input type="email" name="email" x-model="form.email" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.email') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
+                        <?php if (session('errors.email')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.email') ?></p>
+                        <?php endif ?>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <input type="text" name="username" x-model="form.username" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <input type="text" name="username" x-model="form.username" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.username') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
+                        <?php if (session('errors.username')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.username') ?></p>
+                        <?php endif ?>
                     </div>
 
                     <div>
@@ -122,7 +143,12 @@
                             Password
                             <span x-show="isEdit" class="text-xs text-gray-500 font-normal">(Kosongkan jika tidak ingin mengubah)</span>
                         </label>
-                        <input type="password" name="password" x-model="form.password" :required="!isEdit" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent">
+                        <input type="password" name="password" x-model="form.password" :required="!isEdit" 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.password') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>">
+                        <?php if (session('errors.password')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.password') ?></p>
+                        <?php endif ?>
                     </div>
 
                     <div class="pt-4 flex justify-end space-x-3">

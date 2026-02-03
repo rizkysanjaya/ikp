@@ -24,14 +24,52 @@ class Users extends BaseController
         $id = $this->request->getPost('id');
 
         $rules = [
-            'name'     => 'required',
-            'email'    => 'required|valid_email|is_unique[users.email,id,' . ($id ?? 0) . ']',
-            'username' => 'required|is_unique[users.username,id,' . ($id ?? 0) . ']',
+            'name'     => [
+                'rules'  => 'required|max_length[100]',
+                'errors' => [
+                    'required'   => 'Nama lengkap wajib diisi.',
+                    'max_length' => 'Nama lengkap maksimal 100 karakter.'
+                ]
+            ],
+            'email'    => [
+                'rules'  => 'required|valid_email|max_length[100]|is_unique[users.email,id,' . ($id ?? 0) . ']',
+                'errors' => [
+                    'required'    => 'Email wajib diisi.',
+                    'valid_email' => 'Format email tidak valid (contoh: user@bkn.go.id).',
+                    'max_length'  => 'Email maksimal 100 karakter.',
+                    'is_unique'   => 'Email ini sudah terdaftar, gunakan email lain.'
+                ]
+            ],
+            'username' => [
+                'rules'  => 'required|max_length[100]|is_unique[users.username,id,' . ($id ?? 0) . ']',
+                'errors' => [
+                    'required'   => 'Username wajib diisi.',
+                    'max_length' => 'Username maksimal 100 karakter.',
+                    'is_unique'  => 'Username ini sudah digunakan.'
+                ]
+            ],
         ];
 
-        // Password validation: required only for new users
+        // Password validation
+        $passwordInput = $this->request->getPost('password');
+
         if (empty($id)) {
-            $rules['password'] = 'required|min_length[6]';
+            // New User: Required
+            $rules['password'] = [
+                'rules'  => 'required|min_length[8]',
+                'errors' => [
+                    'required'   => 'Password wajib diisi.',
+                    'min_length' => 'Password minimal terdiri dari 8 karakter untuk keamanan.'
+                ]
+            ];
+        } elseif (!empty($passwordInput)) {
+            // Update User: Only validate if password is provided
+            $rules['password'] = [
+                'rules'  => 'min_length[8]',
+                'errors' => [
+                    'min_length' => 'Password minimal terdiri dari 8 karakter untuk keamanan.'
+                ]
+            ];
         }
 
         if (!$this->validate($rules)) {

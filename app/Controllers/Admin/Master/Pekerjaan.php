@@ -24,7 +24,13 @@ class Pekerjaan extends BaseController
         $id = $this->request->getPost('id');
 
         if (!$this->validate([
-            'nama_pekerjaan' => 'required',
+            'nama_pekerjaan' => [
+                'rules'  => 'required|max_length[100]',
+                'errors' => [
+                    'required'   => 'Nama pekerjaan wajib diisi.',
+                    'max_length' => 'Nama pekerjaan maksimal 100 karakter.'
+                ]
+            ],
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }

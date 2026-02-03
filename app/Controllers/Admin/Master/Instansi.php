@@ -28,11 +28,24 @@ class Instansi extends BaseController
         $id = $this->request->getPost('id');
 
         $rules = [
-            'nama_instansi' => 'required',
+            'nama_instansi' => [
+                'rules'  => 'required|max_length[255]',
+                'errors' => [
+                    'required'   => 'Nama instansi wajib diisi.',
+                    'max_length' => 'Nama instansi maksimal 255 karakter.'
+                ]
+            ]
         ];
 
         if (empty($originalId)) {
-            $rules['id'] = 'required|is_unique[ref_instansi.id]';
+            $rules['id'] = [
+                'rules'  => 'required|max_length[10]|is_unique[ref_instansi.id]',
+                'errors' => [
+                    'required'   => 'Kode instansi wajib diisi.',
+                    'max_length' => 'Kode instansi maksimal 10 karakter.',
+                    'is_unique'  => 'Kode instansi sudah digunakan.'
+                ]
+            ];
         }
 
         if (!$this->validate($rules)) {

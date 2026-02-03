@@ -2,9 +2,13 @@
 
 <?= $this->section('content') ?>
 <div x-data="{ 
-    showModal: false, 
-    isEdit: false,
-    form: { id: '', kode_layanan: '', nama_layanan: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    isEdit: <?= old('id') ? 'true' : 'false' ?>,
+    form: { 
+        id: '<?= old('id') ?>', 
+        kode_layanan: '<?= old('kode_layanan') ?>', 
+        nama_layanan: '<?= old('nama_layanan') ?>' 
+    },
     openAdd() {
         this.isEdit = false;
         this.form = { id: '', kode_layanan: '', nama_layanan: '' };
@@ -125,11 +129,23 @@
                     <input type="hidden" name="id" x-model="form.id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kode Layanan</label>
-                        <input type="text" name="kode_layanan" x-model="form.kode_layanan" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: KL001">
+                        <input type="text" name="kode_layanan" x-model="form.kode_layanan" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.kode_layanan') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>" 
+                               placeholder="Contoh: KL001">
+                        <?php if (session('errors.kode_layanan')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.kode_layanan') ?></p>
+                        <?php endif ?>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Unit Layanan</label>
-                        <input type="text" name="nama_layanan" x-model="form.nama_layanan" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: Sistem Informasi dan Digitalisasi">
+                        <input type="text" name="nama_layanan" x-model="form.nama_layanan" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.nama_layanan') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>" 
+                               placeholder="Contoh: Sistem Informasi dan Digitalisasi">
+                        <?php if (session('errors.nama_layanan')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.nama_layanan') ?></p>
+                        <?php endif ?>
                     </div>
                     <div class="pt-4 flex justify-end space-x-3">
                         <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">Batal</button>

@@ -2,8 +2,12 @@
 
 <?= $this->section('content') ?>
 <div x-data="{ 
-    showModal: false, 
-    form: { id: '', kode_unsur: '', nama_unsur: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    form: { 
+        id: '<?= old('id') ?>', 
+        kode_unsur: '<?= old('kode_unsur') ?>', 
+        nama_unsur: '<?= old('nama_unsur') ?>' 
+    },
     openEdit(item) {
         this.form = { id: item.id, kode_unsur: item.kode_unsur, nama_unsur: item.nama_unsur };
         this.showModal = true;
@@ -99,7 +103,12 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Unsur</label>
-                        <textarea name="nama_unsur" x-model="form.nama_unsur" required rows="3" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent"></textarea>
+                        <textarea name="nama_unsur" x-model="form.nama_unsur" required rows="3" 
+                                  class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                                  <?= session('errors.nama_unsur') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>"></textarea>
+                        <?php if (session('errors.nama_unsur')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.nama_unsur') ?></p>
+                        <?php endif ?>
                     </div>
 
                     <div class="pt-4 flex justify-end space-x-3">

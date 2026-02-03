@@ -6,9 +6,13 @@
     allData: <?= htmlspecialchars(json_encode($instansi), ENT_QUOTES, 'UTF-8') ?>,
     currentPage: 1,
     itemsPerPage: 10,
-    showModal: false, 
-    isEdit: false,
-    form: { original_id: '', id: '', nama_instansi: '' },
+    showModal: <?= session('errors') ? 'true' : 'false' ?>, 
+    isEdit: <?= old('original_id') ? 'true' : 'false' ?>,
+    form: { 
+        original_id: '<?= old('original_id') ?>', 
+        id: '<?= old('id') ?>', 
+        nama_instansi: '<?= old('nama_instansi') ?>' 
+    },
     
     // Filter Logic
     get filteredData() {
@@ -192,11 +196,23 @@
                     <input type="hidden" name="original_id" x-model="form.original_id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kode Instansi</label>
-                        <input type="text" name="id" x-model="form.id" :readonly="isEdit" :class="{'bg-gray-100 cursor-not-allowed': isEdit}" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: 4011">
+                        <input type="text" name="id" x-model="form.id" :readonly="isEdit" 
+                               :class="{'bg-gray-100 cursor-not-allowed': isEdit, 'border-red-500 ring-1 ring-red-500 bg-red-50': <?= session('errors.id') ? 'true' : 'false' ?>}" 
+                               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors" 
+                               placeholder="Contoh: 4011" required>
+                        <?php if (session('errors.id')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.id') ?></p>
+                        <?php endif ?>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Instansi</label>
-                        <input type="text" name="nama_instansi" x-model="form.nama_instansi" required class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent" placeholder="Contoh: Badan Kepegawaian Negara">
+                        <input type="text" name="nama_instansi" x-model="form.nama_instansi" required 
+                               class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0e4c92] focus:border-transparent transition-colors
+                               <?= session('errors.nama_instansi') ? 'border-red-500 ring-1 ring-red-500 bg-red-50' : 'border-gray-300' ?>" 
+                               placeholder="Contoh: Badan Kepegawaian Negara">
+                        <?php if (session('errors.nama_instansi')) : ?>
+                            <p class="text-red-500 text-xs mt-1 font-medium animate-pulse"><?= session('errors.nama_instansi') ?></p>
+                        <?php endif ?>
                     </div>
                     <div class="pt-4 flex justify-end space-x-3">
                         <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">Batal</button>

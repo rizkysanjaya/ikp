@@ -88,6 +88,54 @@ class Dashboard extends BaseController
         return view('admin/dashboard', $data);
     }
     
-    // getUpdates removed as it was placeholder logic, now handled by shared logic if needed
-    // keeping it simple for now, can re-add if AJAX filtering is needed
+    public function getUpdates()
+    {
+        if (!$this->request->isAJAX()) {
+             // Optional: Block non-AJAX or just return 404
+        }
+        
+        $db = \Config\Database::connect();
+        $currentYear = date('Y');
+
+        // 1. Re-calculate Header Stats
+        $totalSurvei = $db->table('trans_responden')->countAll();
+        $totalUnit   = $db->table('ref_jenis_layanan')->where('is_active', 1)->countAllResults();
+        $todaySurvei = $db->table('trans_responden')->where('DATE(tanggal_survei)', date('Y-m-d'))->countAllResults();
+
+        // 2. Re-calculate Unit Stats
+        $listUnsur = $db->table('ref_unsur_pelayanan')->get()->getResult();
+        $units = $db->table('ref_jenis_layanan')->where('is_active', 1)->get()->getResult();
+        $unitData = [];
+
+        foreach ($units as $unit) {
+            $respondenQuery = $db->table('trans_responden')
+                ->select('id')
+                ->where('jenis_layanan_id', $unit->id)
+                ->where("YEAR(tanggal_survei)", $currentYear)
+                ->get();
+
+            $respondenIds = array_column($respondenQuery->getResultArray(), 'id');
+            $stats = $this->calculateIKM($db, $respondenIds, $listUnsur);
+
+            $unitData[] = [
+                'nama_layanan'    => $unit->nama_layanan,
+                'total_responden' => $stats['total_responden'],
+                'ikm_score'       => $stats['ikm_formatted'],
+                'mutu'            => $stats['mutu'],
+                'ket'             => $stats['ket'],
+                'mutu_class'      => 'text-' . $stats['class_color'] . '-600 bg-' . $stats['class_color'] . '-100'
+            ];
+        }
+
+        // 3. Render Partial HTML
+        $htmlUnits = view('admin/partials/unit_cards', ['unitData' => $unitData]);
+
+        // 4. Return JSON
+        return $this->response->setJSON([
+            'totalSurvei' => number_format($totalSurvei),
+            'totalUnit'   => number_format($totalUnit),
+            'todaySurvei' => number_format($todaySurvei),
+            'htmlUnits'   => $htmlUnits
+        ]);
+    }
 }

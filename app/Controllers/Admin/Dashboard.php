@@ -27,9 +27,11 @@ class Dashboard extends BaseController
         // ---------------------------------------------------------
         $listUnsur = $db->table('ref_unsur_pelayanan')->get()->getResult();
 
-        // Get ALL Respondents for this year
+        // Get ALL Respondents for this year FROM ACTIVE UNITS ONLY
         $allRespondents = $db->table('trans_responden')
-            ->select('id')
+            ->select('trans_responden.id')
+            ->join('ref_jenis_layanan', 'ref_jenis_layanan.id = trans_responden.jenis_layanan_id')
+            ->where('ref_jenis_layanan.is_active', 1)
             ->where("YEAR(tanggal_survei)", $currentYear)
             ->get()->getResultArray();
         $allRespondentIds = array_column($allRespondents, 'id');
@@ -97,7 +99,10 @@ class Dashboard extends BaseController
         $db = \Config\Database::connect();
         $currentYear = date('Y');
 
-        // 1. Re-calculate Header Stats
+        // 1. Re-calculate Header Stats (Global)
+        // Keep Total Survey as is (Historical), or Filter? 
+        // Usually Total Survey = All Respondents. 
+        // But "Total Unit" = Active Units.
         $totalSurvei = $db->table('trans_responden')->countAll();
         $totalUnit   = $db->table('ref_jenis_layanan')->where('is_active', 1)->countAllResults();
         $todaySurvei = $db->table('trans_responden')->where('DATE(tanggal_survei)', date('Y-m-d'))->countAllResults();

@@ -50,13 +50,15 @@ class Home extends BaseController
         $layananModel = new \App\Models\RefJenisLayananModel();
         $unsurModel   = new \App\Models\RefUnsurPelayananModel();
         
-        $listLayanan = $layananModel->findAll();
+        $listLayanan = $layananModel->where('is_active', 1)->findAll();
         $listUnsur   = $unsurModel->findAll();
 
         // --- GLOBAL IKM CALCULATION (ALL UNITS) ---
-        // Get ALL Respondents for this year
+        // Get ALL Respondents for this year FROM ACTIVE UNITS ONLY
         $allRespondents = $db->table('trans_responden')
-            ->select('id')
+            ->select('trans_responden.id')
+            ->join('ref_jenis_layanan', 'ref_jenis_layanan.id = trans_responden.jenis_layanan_id')
+            ->where('ref_jenis_layanan.is_active', 1)
             ->where("YEAR(tanggal_survei)", $currentYear)
             ->get()->getResultArray();
         $allRespondentIds = array_column($allRespondents, 'id');

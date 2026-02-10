@@ -81,6 +81,10 @@ class Laporan extends BaseController
             // Apply unit filter ONLY if not 'all'
             if ($layananId !== 'all') {
                 $query->where('trans_responden.jenis_layanan_id', $layananId);
+            } else {
+                // If 'all', filter inactive units to match dashboard logic
+                $query->join('ref_jenis_layanan', 'ref_jenis_layanan.id = trans_responden.jenis_layanan_id')
+                      ->where('ref_jenis_layanan.is_active', 1);
             }
 
             $respondents = $query->findAll();

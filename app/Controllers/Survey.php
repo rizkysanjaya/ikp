@@ -126,6 +126,10 @@ class Survey extends BaseController
             return redirect()->back()->with('error', 'Unit layanan tidak valid.');
         }
 
+        if ($layanan->is_active == 0) {
+            return redirect()->back()->with('error', 'Unit layanan ini sedang tidak aktif.');
+        }
+
         // 3. Simpan Data Responden
         $respondenModel = new SurveyRespondenModel();
         $dataResponden = [

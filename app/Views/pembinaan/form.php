@@ -87,7 +87,7 @@
 
             <form action="<?= base_url('pembinaan/submit') ?>" method="post" id="surveyForm">
                 <?= csrf_field() ?>
-                <input type="hidden" name="unit_kerja_terkait" value="<?= esc($selected_unit) ?>">
+                <input type="hidden" name="layanan_id" value="<?= esc($layanan_id) ?>">
 
                 <!-- PART 1: DATA RESPONDEN -->
                 <div id="step1" class="space-y-6 animate-fade-in">
@@ -106,7 +106,7 @@
                             <select id="instansi-select" name="instansi_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm">
                                 <option value="">-- Pilih Instansi --</option>
                                 <?php foreach($instansi as $ins): ?>
-                                    <option value="<?= $ins->nama_instansi ?>" <?= (old('instansi_id') == $ins->nama_instansi) ? 'selected' : '' ?>><?= $ins->nama_instansi ?></option>
+                                    <option value="<?= $ins->id ?>" <?= (old('instansi_id') == $ins->id) ? 'selected' : '' ?>><?= esc($ins->nama_instansi) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -144,14 +144,23 @@
                         </div>
                         
                         <!-- Pendidikan Terakhir -->
-                         <div class="md:col-span-2">
+                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Pendidikan Terakhir <span class="text-red-500">*</span></label>
-                            <select name="pendidikan_terakhir" required class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white">
+                            <select name="pendidikan_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white">
                                 <option value="">Pilih Pendidikan</option>
-                                <?php 
-                                $edu = ['SD ke bawah', 'SMP / Sederajat', 'SMA / Sederajat', 'D1', 'D2', 'D3', 'D4 / S1', 'S2', 'S3'];
-                                foreach($edu as $e): ?>
-                                    <option value="<?= $e ?>" <?= (old('pendidikan_terakhir') == $e) ? 'selected' : '' ?>><?= $e ?></option>
+                                <?php foreach($pendidikan as $p): ?>
+                                    <option value="<?= $p->id ?>" <?= (old('pendidikan_id') == $p->id) ? 'selected' : '' ?>><?= esc($p->nama_pendidikan) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Pekerjaan -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pekerjaan <span class="text-red-500">*</span></label>
+                            <select name="pekerjaan_id" required class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white">
+                                <option value="">Pilih Pekerjaan</option>
+                                <?php foreach($pekerjaan as $p): ?>
+                                    <option value="<?= $p->id ?>" <?= (old('pekerjaan_id') == $p->id) ? 'selected' : '' ?>><?= esc($p->nama_pekerjaan) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

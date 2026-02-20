@@ -171,23 +171,31 @@
                                     <td class="px-4 py-3 border-r border-gray-200 text-xs whitespace-nowrap text-gray-600">
                                         <?= date('d/m/Y H:i', strtotime($row->tanggal_survei)) ?>
                                     </td>
-                                    <td class="px-4 py-3 text-xs italic text-gray-600" data-full-text="<?= esc($row->saran_masukan, 'attr') ?>">
-                                        <?php $saran = (string)$row->saran_masukan; ?>
-                                        <?php if (mb_strlen($saran) > 100): ?>
+                                    <td class="px-4 py-3 text-xs italic text-gray-600 relative group/cell">
+                                        <?php 
+                                            $saran = (string)($row->saran_masukan ?? '-'); 
+                                            $isLong = mb_strlen($saran) > 100;
+                                        ?>
+                                        <?php if ($isLong): ?>
                                             <div x-data="{ expanded: false }">
-                                                <span x-show="!expanded">
-                                                    <?= esc(mb_substr($saran, 0, 100)) ?>...
-                                                </span>
-                                                <span x-show="expanded" style="display: none;">
-                                                    <?= esc($saran) ?>
-                                                </span>
-                                                <button @click="expanded = !expanded" class="text-blue-600 hover:text-blue-800 font-semibold ml-1 focus:outline-none underline">
-                                                    <span x-show="!expanded">Lihat</span>
-                                                    <span x-show="expanded">Tutup</span>
+                                                <div class="relative">
+                                                    <span x-show="!expanded" class="line-clamp-2">
+                                                        "<?= esc(mb_substr($saran, 0, 100)) ?>..."
+                                                    </span>
+                                                    <span x-show="expanded" x-cloak class="block">
+                                                        "<?= esc($saran) ?>"
+                                                    </span>
+                                                </div>
+                                                <button @click="expanded = !expanded" 
+                                                        class="mt-1 text-[#0e4c92] hover:text-[#093566] font-semibold text-[11px] inline-flex items-center gap-1 transition-colors">
+                                                    <span x-text="expanded ? 'Sembunyikan' : 'Lihat selengkapnya'"></span>
+                                                    <svg class="w-3 h-3 transform transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         <?php else: ?>
-                                            <?= esc($saran) ?>
+                                            "<?= esc($saran) ?>"
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -354,7 +362,8 @@
     });
 </script>
 
-
+<!-- Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <!-- Highcharts Library -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>

@@ -13,13 +13,17 @@ class Pembinaan extends BaseController
     {
         // 1. Fetch Questions
         $pertanyaanModel = new RefPertanyaanPembinaanModel();
-        $instansiModel = new RefInstansiModel(); // Added this line
+        $instansiModel = new RefInstansiModel();
+        $pendidikanModel = new \App\Models\RefPendidikanModel();
+        $pekerjaanModel = new \App\Models\RefPekerjaanModel();
 
         $questions = $pertanyaanModel->where('is_active', 1)
             ->orderBy('nomor_urut', 'ASC')
             ->findAll();
         
-        $instansi = $instansiModel->orderBy('nama_instansi', 'ASC')->findAll(); // Added this line
+        $instansi = $instansiModel->orderBy('nama_instansi', 'ASC')->findAll();
+        $pendidikan = $pendidikanModel->where('is_active', 1)->orderBy('id', 'ASC')->findAll();
+        $pekerjaan = $pekerjaanModel->where('is_active', 1)->orderBy('nama_pekerjaan', 'ASC')->findAll();
 
         $selectedUnit = $this->request->getGet('unit'); // Get 'unit' from URL
 
@@ -28,11 +32,21 @@ class Pembinaan extends BaseController
             return redirect()->to(base_url('/#unit-layanan'))->with('error', 'Silakan pilih unit layanan terlebih dahulu.');
         }
 
+        // Fetch Unit ID
+        $layananModel = new \App\Models\RefJenisLayananModel();
+        $unitData = $layananModel->where('nama_layanan', $selectedUnit)->first();
+        if (!$unitData) {
+            return redirect()->to(base_url('/#unit-layanan'))->with('error', 'Unit layanan tidak valid.');
+        }
+
         $data = [
             'title' => 'Survei Pembinaan Kepegawaian',
             'questions' => $questions,
-            'instansi' => $instansi, // Added this line
-            'selected_unit' => $selectedUnit // Pass to view
+            'instansi' => $instansi,
+            'pendidikan' => $pendidikan,
+            'pekerjaan' => $pekerjaan,
+            'selected_unit' => $selectedUnit, // Pass string for display
+            'layanan_id' => is_array($unitData) ? $unitData['id'] : $unitData->id // Pass ID for DB storage
         ];
 
         return view('pembinaan/form', $data);
@@ -42,16 +56,17 @@ class Pembinaan extends BaseController
     {
         // 1. Validation
         if (!$this->validate([
-            'unit_kerja_terkait'  => 'required',
             'tema_kegiatan'       => 'required',
             'tanggal_pelaksanaan' => 'required|valid_date',
             'tempat_pelaksanaan'  => 'required',
             'metode_penyampaian'  => 'required',
             'kelompok_usia'       => 'required',
             'jenis_kelamin'       => 'required',
-            'pendidikan_terakhir' => 'required',
+            'pendidikan_id'       => 'required',
+            'pekerjaan_id'        => 'required',
+            'instansi_id'         => 'required',
+            'layanan_id'          => 'required',
             'jawaban'             => 'required'
-            // instansi_id or nama_instansi are handled via conditional check or frontend required
         ])) {
             return redirect()->back()->withInput()->with('error', 'Mohon lengkapi semua isian wajib.');
         }
@@ -59,16 +74,17 @@ class Pembinaan extends BaseController
         // 2. Save Respondent Data
         $respondenModel = new TransRespondenPembinaanModel();
         $dataResponden = [
-            'nama_lengkap'        => $this->request->getPost('nama_lengkap'), // Manual Input
-            'instansi_terpilih'   => $this->request->getPost('instansi_id'),   // Dropdown Selection
-            'unit_kerja_terkait'  => $this->request->getPost('unit_kerja_terkait'),
+            'nama_lengkap'        => $this->request->getPost('nama_lengkap'),
+            'instansi_id'         => $this->request->getPost('instansi_id'),
+            'layanan_id'          => $this->request->getPost('layanan_id'),
             'tema_kegiatan'       => $this->request->getPost('tema_kegiatan'),
             'tanggal_pelaksanaan' => $this->request->getPost('tanggal_pelaksanaan'),
             'tempat_pelaksanaan'  => $this->request->getPost('tempat_pelaksanaan'),
             'metode_penyampaian'  => $this->request->getPost('metode_penyampaian'),
             'kelompok_usia'       => $this->request->getPost('kelompok_usia'),
             'jenis_kelamin'       => $this->request->getPost('jenis_kelamin'),
-            'pendidikan_terakhir' => $this->request->getPost('pendidikan_terakhir'),
+            'pendidikan_id'       => $this->request->getPost('pendidikan_id'),
+            'pekerjaan_id'        => $this->request->getPost('pekerjaan_id'),
             'saran_masukan'       => $this->request->getPost('saran_masukan'),
             'tanggal_survei'      => date('Y-m-d H:i:s')
         ];
@@ -81,12 +97,27 @@ class Pembinaan extends BaseController
         $jawaban = $this->request->getPost('jawaban'); // Array [soal_id => skor]
         $dataJawaban = [];
 
+        // Pre-fetch generic opsi_jawaban_id mapping
+        $db = \Config\Database::connect();
+        $opsiQuery = $db->table('ref_opsi_jawaban')
+           ->where('soal_id', null)
+           ->get()->getResult();
+        
+        $scoreToOpsiId = [];
+        foreach($opsiQuery as $opt) {
+            if (!isset($scoreToOpsiId[$opt->bobot_nilai])) {
+                 $scoreToOpsiId[$opt->bobot_nilai] = $opt->id;
+            }
+        }
+
         if (is_array($jawaban)) {
             foreach ($jawaban as $soalId => $skor) {
+                $opsiId = $scoreToOpsiId[$skor] ?? null;
+
                 $dataJawaban[] = [
                     'responden_pembinaan_id'  => $respondenId,
                     'pertanyaan_pembinaan_id' => $soalId,
-                    'skor_jawaban'            => $skor
+                    'opsi_jawaban_id'         => $opsiId
                 ];
             }
             if (!empty($dataJawaban)) $jawabanModel->insertBatch($dataJawaban);

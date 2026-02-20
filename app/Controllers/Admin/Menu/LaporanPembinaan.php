@@ -22,8 +22,11 @@ class LaporanPembinaan extends BaseController
         $selectedUnit = $this->request->getGet('unit'); // Filter by Unit Name
         
         // Fetch Questions
-        $questions = $pertanyaanModel->where('is_active', 1)
-            ->orderBy('nomor_urut', 'ASC')
+        $questions = $pertanyaanModel
+            ->select('ref_pertanyaan_pembinaan.*, ref_unsur_pembinaan.kode_unsur, ref_unsur_pembinaan.nama_unsur')
+            ->join('ref_unsur_pembinaan', 'ref_unsur_pembinaan.id = ref_pertanyaan_pembinaan.unsur_id', 'left')
+            ->where('ref_pertanyaan_pembinaan.is_active', 1)
+            ->orderBy('ref_pertanyaan_pembinaan.nomor_urut', 'ASC')
             ->findAll();
 
         // Fetch Units for Dropdown
@@ -42,24 +45,33 @@ class LaporanPembinaan extends BaseController
         ];
 
         if ($startDate && $endDate) {
-            // 1. Get Respondents
+            // 1. Get Respondents -> Join with ref tables to get related names instead of IDs
             $query = $respondenModel
-                ->where("DATE(tanggal_pelaksanaan) >=", $startDate)
-                ->where("DATE(tanggal_pelaksanaan) <=", $endDate);
+                ->select('trans_responden_pembinaan.*, ref_instansi.nama_instansi as instansi_terpilih, ref_pendidikan.nama_pendidikan as pendidikan_terakhir, ref_pekerjaan.nama_pekerjaan, ref_jenis_layanan.nama_layanan as unit_kerja_terkait')
+                ->join('ref_instansi', 'ref_instansi.id = trans_responden_pembinaan.instansi_id', 'left')
+                ->join('ref_pendidikan', 'ref_pendidikan.id = trans_responden_pembinaan.pendidikan_id', 'left')
+                ->join('ref_pekerjaan', 'ref_pekerjaan.id = trans_responden_pembinaan.pekerjaan_id', 'left')
+                ->join('ref_jenis_layanan', 'ref_jenis_layanan.id = trans_responden_pembinaan.layanan_id', 'left')
+                ->where("DATE(trans_responden_pembinaan.tanggal_pelaksanaan) >=", $startDate)
+                ->where("DATE(trans_responden_pembinaan.tanggal_pelaksanaan) <=", $endDate);
 
             // Apply Unit Filter if selected
             if ($selectedUnit && $selectedUnit !== 'all') {
-                $query->where('unit_kerja_terkait', $selectedUnit);
+                $query->where('ref_jenis_layanan.nama_layanan', $selectedUnit);
             }
 
-            $respondents = $query->orderBy('tanggal_pelaksanaan', 'DESC')->findAll();
+            $respondents = $query->orderBy('trans_responden_pembinaan.tanggal_pelaksanaan', 'DESC')->findAll();
 
             if (!empty($respondents)) {
                 $respondentIds = array_column($respondents, 'id');
                 $totalRespondents = count($respondents);
 
                 // 2. Get Answers
-                $answers = $jawabanModel->whereIn('responden_pembinaan_id', $respondentIds)->findAll();
+                $answers = $jawabanModel
+                    ->select('trans_jawaban_pembinaan.*, ref_opsi_jawaban.bobot_nilai as skor_jawaban')
+                    ->join('ref_opsi_jawaban', 'ref_opsi_jawaban.id = trans_jawaban_pembinaan.opsi_jawaban_id', 'left')
+                    ->whereIn('trans_jawaban_pembinaan.responden_pembinaan_id', $respondentIds)
+                    ->findAll();
 
                 // 3. Map Answers & Calculate Stats
                 $matrix = []; 
@@ -74,7 +86,7 @@ class LaporanPembinaan extends BaseController
 
                 foreach ($answers as $ans) {
                     $qid = $ans['pertanyaan_pembinaan_id'];
-                    $score = $ans['skor_jawaban'];
+                    $score = $ans['skor_jawaban'] ?? 0;
                     
                     // Matrix for Table
                     $matrix[$ans['responden_pembinaan_id']][$qid] = $score;

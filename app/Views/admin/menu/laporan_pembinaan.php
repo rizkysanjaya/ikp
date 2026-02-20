@@ -134,8 +134,8 @@
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Indikator Penilaian</span>
                     <div class="flex flex-wrap gap-2">
                         <?php foreach ($questions as $q): ?>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100" title="<?= esc($q->pertanyaan) ?>">
-                                <span class="font-bold mr-1">P<?= $q->nomor_urut ?>:</span> <?= esc(substr($q->pertanyaan, 0, 50)) ?>...
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100" title="<?= esc($q->nama_unsur . ': ' . $q->pertanyaan) ?>">
+                                <span class="font-bold mr-1"><?= esc($q->kode_unsur) ?>:</span> <?= esc(substr($q->nama_unsur, 0, 50)) ?>
                             </span>
                         <?php endforeach; ?>
                     </div>
@@ -170,7 +170,7 @@
                         </tr>
                         <tr>
                             <?php foreach ($questions as $q): ?>
-                                <th class="px-2 py-2 font-bold border-r border-gray-300 text-center w-10 bg-orange-50/80 text-[#ea580c]" title="<?= esc($q->pertanyaan) ?>">P<?= $q->nomor_urut ?></th>
+                                <th class="px-2 py-2 font-bold border-r border-gray-300 text-center w-10 bg-orange-50/80 text-[#ea580c]" title="<?= esc($q->nama_unsur) ?>"><?= esc($q->kode_unsur) ?></th>
                             <?php endforeach; ?>
                         </tr>
                     </thead>
@@ -211,8 +211,32 @@
                                         <li><?= esc($row['unit_kerja_terkait']) ?></li>
                                     </ol>
                                 </td>
-                                <td class="px-4 py-3 text-xs italic text-gray-600">
-                                    "<?= esc($row['saran_masukan'] ?: '-') ?>"
+                                <td class="px-4 py-3 text-xs italic text-gray-600 relative group/cell">
+                                    <?php 
+                                        $saran = (string)($row['saran_masukan'] ?? '-'); 
+                                        $isLong = mb_strlen($saran) > 100;
+                                    ?>
+                                    <?php if ($isLong): ?>
+                                        <div x-data="{ expanded: false }">
+                                            <div class="relative">
+                                                <span x-show="!expanded" class="line-clamp-2">
+                                                    "<?= esc(mb_substr($saran, 0, 100)) ?>..."
+                                                </span>
+                                                <span x-show="expanded" x-cloak class="block">
+                                                    "<?= esc($saran) ?>"
+                                                </span>
+                                            </div>
+                                            <button @click="expanded = !expanded" 
+                                                    class="mt-1 text-[#ea580c] hover:text-[#c2410c] font-semibold text-[11px] inline-flex items-center gap-1 transition-colors">
+                                                <span x-text="expanded ? 'Sembunyikan' : 'Lihat selengkapnya'"></span>
+                                                <svg class="w-3 h-3 transform transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    <?php else: ?>
+                                        "<?= esc($saran) ?>"
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -336,6 +360,7 @@
     <?php endif; ?>
 </div>
 
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <!-- Highcharts Library -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -351,7 +376,7 @@
     // Inject Data
     window.ReportStats = <?= ($reportData && !empty($reportData['stats'])) ? json_encode($reportData['stats'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : 'null' ?>;
     window.QuestionsData = <?= !empty($questions) ? json_encode($questions, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : '[]' ?>;
-    window.globalUnsurData = window.QuestionsData.map(q => ({ id: q.id, kode_unsur: 'P' + q.nomor_urut, nama_unsur: q.pertanyaan }));
+    window.globalUnsurData = window.QuestionsData.map(q => ({ id: q.id, kode_unsur: q.kode_unsur, nama_unsur: q.nama_unsur }));
     window.RespondentsData = <?= ($reportData && !empty($reportData['respondents'])) ? json_encode($reportData['respondents'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) : '[]' ?>;
     
     // Smooth Scroll
@@ -382,8 +407,8 @@
             
             // 1. Bar Chart (NRR per Question)
             const nrrValues = qData.map(q => parseFloat(parseFloat(stats.nrr_per_unsur[q.id]).toFixed(2)));
-            const qLabels = qData.map(q => 'P' + q.nomor_urut);
-            const qFullNames = qData.map(q => q.pertanyaan);
+            const qLabels = qData.map(q => q.kode_unsur);
+            const qFullNames = qData.map(q => q.nama_unsur);
 
             Highcharts.chart('chart-nrr', {
                 chart: { type: 'column' },
@@ -437,11 +462,11 @@
                 Highcharts.chart(`chart-pie-${q.id}`, {
                     chart: { type: 'pie' },
                     title: {
-                        text: 'P' + q.nomor_urut,
+                        text: q.kode_unsur,
                         style: { fontSize: '14px', fontWeight: 'bold' }
                     },
                     subtitle: {
-                        text: q.pertanyaan.substring(0, 60) + (q.pertanyaan.length > 60 ? '...' : ''),
+                        text: q.nama_unsur,
                         style: { fontSize: '11px', color: '#666' }
                     },
                     credits: { enabled: false },
@@ -497,8 +522,8 @@
             // Assuming laporan-export.js uses `window.UnsurData` for headers.
             window.UnsurData = qData.map(q => ({
                 id: q.id,
-                kode_unsur: 'P' + q.nomor_urut,
-                nama_unsur: q.pertanyaan
+                kode_unsur: q.kode_unsur,
+                nama_unsur: q.nama_unsur
             }));
             
             // Map respondents data structure if needed

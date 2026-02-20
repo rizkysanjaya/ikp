@@ -1,0 +1,31 @@
+﻿commit 6a7380f701d218f1cffb4442a2f741f312d87fcc
+Author: rizkysanjaya <sanjayatandia@gmail.com>
+Date:   Fri Feb 20 10:38:44 2026 +0700
+
+    Implement Pembinaan feature and related updates
+
+commit e7a92383e9d92ae3a1b9c365728c9fb23640cad3
+Author: rizkysanjaya <sanjayatandia@gmail.com>
+Date:   Tue Feb 10 17:50:06 2026 +0700
+
+    fix: exclude inactive units from global IKM calculation
+
+commit 699217dfeba4c8fb33392631746ba2366a593bf5
+Author: rizkysanjaya <sanjayatandia@gmail.com>
+Date:   Wed Feb 4 12:16:14 2026 +0700
+
+    fix: dashboard realtime update
+
+commit ce29d29880a012fbeaad1e26065c56969993e2e7
+Author: rizkysanjaya <sanjayatandia@gmail.com>
+Date:   Tue Feb 3 11:57:56 2026 +0700
+
+    feat: standardize validation, harden security, add hosting guide
+
+commit b865c62bbd802a136f9f0d95d3c5dc364133609b
+Author: rizkysanjaya <sanjayatandia@gmail.com>
+Date:   Fri Jan 30 16:34:46 2026 +0700
+
+    Fix: Admin Sidebar Mobile Toggle
+    
+    Refactored Alpine.js scope to body and adjusted CSS classes for robust mobile sidebar toggling.

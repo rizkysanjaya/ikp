@@ -10,5 +10,5 @@ class TransJawabanPembinaanModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['responden_pembinaan_id', 'pertanyaan_pembinaan_id', 'skor_jawaban'];
+    protected $allowedFields    = ['responden_pembinaan_id', 'pertanyaan_pembinaan_id', 'opsi_jawaban_id'];
 }

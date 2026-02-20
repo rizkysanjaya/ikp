@@ -14,11 +14,12 @@ class TransRespondenPembinaanModel extends Model
     protected $allowedFields    = [
         'tanggal_survei',
         'nama_lengkap',
-        'instansi_terpilih', // Added
-        'unit_kerja_terkait',
+        'instansi_id',
+        'layanan_id',
         'kelompok_usia',
         'jenis_kelamin',
-        'pendidikan_terakhir',
+        'pendidikan_id',
+        'pekerjaan_id',
         'tempat_pelaksanaan',
         'tanggal_pelaksanaan',
         'metode_penyampaian',

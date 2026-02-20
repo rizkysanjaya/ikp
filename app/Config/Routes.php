@@ -27,6 +27,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     $routes->group('', ['namespace' => 'App\Controllers\Admin\Menu'], function ($routes) {
         $routes->get('about', 'About::index');
         $routes->get('laporan', 'Laporan::index');
+        $routes->get('laporan_pembinaan', 'LaporanPembinaan::index');
         $routes->get('responden', 'Responden::index');
         $routes->get('responden/delete/(:num)', 'Responden::delete/$1');
         $routes->get('users', 'Users::index');
@@ -64,6 +65,10 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
         $routes->get('jawaban/delete/(:num)', 'Jawaban::delete/$1');
     });
 });
+
+// Pembinaan Survey
+$routes->get('pembinaan', 'Pembinaan::index');
+$routes->post('pembinaan/submit', 'Pembinaan::submit');
 
 // Survey
 $routes->group('survey', function ($routes) {

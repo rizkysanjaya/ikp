@@ -79,6 +79,9 @@
                                 <a href="<?= base_url('admin/laporan') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2.5"></span> Laporan IKM
                                 </a>
+                                <a href="<?= base_url('admin/laporan_pembinaan') ?>" class="flex items-center px-4 py-2 text-sm text-blue-200 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-l-2 border-transparent hover:border-blue-300">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-orange-400 mr-2.5"></span> Laporan Pembinaan
+                                </a>
                             </div>
 
                             <!-- Master Data Menu -->

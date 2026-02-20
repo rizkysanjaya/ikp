@@ -1,6 +1,6 @@
 /**
- * Laporan Export Scripts
- * Handles Excel and PDF export logic for the Laporan IKM page.
+ * Laporan Pembinaan Export Scripts
+ * Handles Excel and PDF export logic for the Laporan Pembinaan page.
  * Relies on global window variables injected by PHP:
  * - window.ReportStats
  * - window.UnsurData
@@ -9,7 +9,7 @@
 
 function exportToExcel() {
     const reportStats = window.ReportStats;
-    const unsurData = window.UnsurData;
+    const unsurData = window.globalUnsurData || window.UnsurData || window.QuestionsData; 
     const respondentsData = window.RespondentsData;
 
     if (!reportStats || !respondentsData || !respondentsData.length) {
@@ -17,12 +17,12 @@ function exportToExcel() {
         return;
     }
 
-    // 0. Prepare Metadata (Support both Layanan ID and Unit name)
-    const layananEl = document.querySelector('select[name="layanan_id"] option:checked') || document.querySelector('select[name="unit"] option:checked');
+    // 0. Prepare Metadata
+    const unitEl = document.querySelector('select[name="unit"] option:checked');
     const startEl = document.querySelector('input[name="start_date"]');
     const endEl = document.querySelector('input[name="end_date"]');
 
-    const layananText = layananEl ? layananEl.text : '-';
+    const unitText = unitEl ? unitEl.text : '-';
     const periodeText = (startEl && endEl) ? `${startEl.value} s.d ${endEl.value}` : '-';
     
     // 1. Prepare Table Header
@@ -31,20 +31,18 @@ function exportToExcel() {
     
     unsurData.forEach(u => {
         header1.push("Nilai Per Indikator");
-        header2.push(u.kode_unsur || `P${u.id || u.nomor_urut}`); // Fallback for various ID formats
+        header2.push(u.kode_unsur || `P${u.id || u.nomor_urut}`);
     });
     
-    header1.push("Tanggal", "Kritik/Saran");
-    header2.push("", "");
+    // Specific Pembinaan Columns
+    header1.push("Tempat, Tanggal Pembinaan", "Metode", "Layanan", "Kritik/Saran");
+    header2.push("", "", "", "");
 
     // 2. Prepare Body Rows
     const bodyRows = respondentsData.map((row, index) => {
-        // Handle Instansi Name (IKP: nama_instansi, Pembinaan: instansi_terpilih)
-        const instansi = row.nama_instansi || row.instansi_terpilih || '-';
-        
         const rowData = [
             index + 1,
-            `${row.nama_lengkap.toUpperCase()}\nInstansi: ${instansi}`
+            `${row.nama_lengkap.toUpperCase()}\nInstansi: ${row.instansi_terpilih || '-'}`
         ];
         
         // Scores
@@ -52,12 +50,14 @@ function exportToExcel() {
             rowData.push(row.scores[u.id] || "-"); 
         });
 
-        // Date
-        const date = new Date(row.tanggal_survei);
-        const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-        rowData.push(dateStr);
-
-        // Suggestion
+        // Specific Pembinaan Data
+        const date = new Date(row.tanggal_pelaksanaan); 
+        const dateStr = date.toLocaleDateString('id-ID');
+        const tempatTanggal = `${row.tempat_pelaksanaan || '-'}\n${dateStr}`;
+        
+        rowData.push(tempatTanggal);
+        rowData.push(row.metode_penyampaian || '-');
+        rowData.push(row.unit_kerja_terkait || '-');
         rowData.push(row.saran_masukan || "-");
 
         return rowData;
@@ -74,7 +74,8 @@ function exportToExcel() {
                 if (isFloat) val = parseFloat(val).toFixed(2).replace('.', ',');
                 row.push(val);
             });
-            row.push("", ""); // Date & Saran empty
+            // Pad for extra columns (Tempat, Metode, Layanan, Saran) = 4 columns
+            row.push("", "", "", ""); 
             return row;
     };
 
@@ -83,21 +84,21 @@ function exportToExcel() {
     footerRows.push(padRow("Nilai Indeks Per Parameter", reportStats.nrr_tertimbang, true));
     
     // IKM Row (Custom)
-    const ikmRow = ["Indeks Kepuasan Masyarakat (IKM)", ""];
+    const ikmRow = ["Indeks Kepuasan Pembinaan (IKP)", ""];
     ikmRow.push(parseFloat(reportStats.ikm_konversi).toFixed(2).replace('.', ','));
-    for(let i=0; i<unsurData.length + 1; i++) ikmRow.push(""); 
+    for(let i=0; i<unsurData.length + 3; i++) ikmRow.push(""); 
     footerRows.push(ikmRow);
 
     // Mutu Row
     const mutuRow = ["Mutu Pelayanan", ""];
     mutuRow.push(`${reportStats.mutu} (${reportStats.ket})`);
-        for(let i=0; i<unsurData.length + 1; i++) mutuRow.push(""); 
+        for(let i=0; i<unsurData.length + 3; i++) mutuRow.push(""); 
     footerRows.push(mutuRow);
 
     // 4. Construct Excel Rows with Top Header
     const topHeaderRows = [
-        ["LAPORAN INDEKS KEPUASAN MASYARAKAT (IKM)"],
-        [`Unit Layanan: ${layananText}`],
+        ["LAPORAN SURVEI PEMBINAAN KEPEGAWAIAN"],
+        [`Unit Layanan: ${unitText}`],
         [`Periode: ${periodeText}`],
         [`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`],
         [""] // Spacer
@@ -111,7 +112,7 @@ function exportToExcel() {
 
     // MERGES
     // Top Header Merges (Span across all columns)
-    const totalCols = header1.length - 1;
+    const totalCols = header1.length + 3; 
     const merges = [
         { s: {r:0, c:0}, e: {r:0, c:totalCols} },
         { s: {r:1, c:0}, e: {r:1, c:totalCols} },
@@ -124,8 +125,12 @@ function exportToExcel() {
         { s: {r:T_OFFSET, c:0}, e: {r:T_OFFSET+1, c:0} }, // No
         { s: {r:T_OFFSET, c:1}, e: {r:T_OFFSET+1, c:1} }, // Nama
         { s: {r:T_OFFSET, c:2}, e: {r:T_OFFSET, c:2 + unsurData.length - 1} }, // Header "Nilai"
-        { s: {r:T_OFFSET, c:2 + unsurData.length}, e: {r:T_OFFSET+1, c:2 + unsurData.length} }, // Tanggal
-        { s: {r:T_OFFSET, c:2 + unsurData.length + 1}, e: {r:T_OFFSET+1, c:2 + unsurData.length + 1} } // Saran
+        
+        // Extra columns merges
+        { s: {r:T_OFFSET, c:2 + unsurData.length}, e: {r:T_OFFSET+1, c:2 + unsurData.length} }, // Tempat
+        { s: {r:T_OFFSET, c:2 + unsurData.length + 1}, e: {r:T_OFFSET+1, c:2 + unsurData.length + 1} }, // Metode
+        { s: {r:T_OFFSET, c:2 + unsurData.length + 2}, e: {r:T_OFFSET+1, c:2 + unsurData.length + 2} }, // Layanan
+        { s: {r:T_OFFSET, c:2 + unsurData.length + 3}, e: {r:T_OFFSET+1, c:2 + unsurData.length + 3} } // Saran
     );
     
     // Footer Merges
@@ -152,8 +157,10 @@ function exportToExcel() {
         { wch: 40 }, // Nama
     ];
     unsurData.forEach(() => wscols.push({ wch: 8 })); // Scores
-    wscols.push({ wch: 20 }); // Date
-    wscols.push({ wch: 50 }); // Saran
+    wscols.push({ wch: 25 }); // Tempat Tanggal
+    wscols.push({ wch: 15 }); // Metode
+    wscols.push({ wch: 20 }); // Layanan
+    wscols.push({ wch: 40 }); // Saran
     ws['!cols'] = wscols;
 
     // STYLING
@@ -173,7 +180,7 @@ function exportToExcel() {
             if (R < T_OFFSET) {
                 style.font.bold = true;
                 if(R === 0) style.font.sz = 14; 
-                // No border for top header
+                style.font.color = { rgb: "EA580C" }; // ORANGE
             } 
             // Table Styling (Headers + Body + Footer)
             else {
@@ -185,15 +192,17 @@ function exportToExcel() {
                 };
 
                 // Alignment
-                if (C === 0 || (C >= 2 && C < 2 + unsurData.length) || C === 2 + unsurData.length) {
+                // Center for Scores and No
+                if (C === 0 || (C >= 2 && C < 2 + unsurData.length)) {
                     style.alignment.horizontal = "center";
                 }
 
                 // TABLE HEADERS
                 if (R >= T_OFFSET && R < T_OFFSET + 2) {
-                    style.fill = { fgColor: { rgb: "E5E7EB" } }; // Gray-200
+                    style.fill = { fgColor: { rgb: "FFEDD5" } }; // Orange-100
                     style.font.bold = true;
                     style.alignment.horizontal = "center";
+                    style.font.color = { rgb: "9A3412" }; // Orange-800
                 }
 
                 // FOOTER STYLES
@@ -202,10 +211,10 @@ function exportToExcel() {
                         style.alignment.horizontal = (C >= 2 && C < 2 + unsurData.length) ? "center" : "right";
                         
                         // Specific Footer Colors
-                        if (R === footerStart) style.fill = { fgColor: { rgb: "F3F4F6" } }; // Total
+                        if (R === footerStart) style.fill = { fgColor: { rgb: "FFF7ED" } }; // Orange-50
                         if (R === ikmIdx) { // IKM
-                            style.fill = { fgColor: { rgb: "EFF6FF" } }; // Blue-50
-                            style.font.color = { rgb: "0E4C92" };
+                            style.fill = { fgColor: { rgb: "FFEDD5" } }; // Orange-100
+                            style.font.color = { rgb: "9A3412" };
                             style.font.sz = 14;
                             if (C === 2) style.alignment.horizontal = "center";
                         }
@@ -236,13 +245,13 @@ function exportToExcel() {
 
     // EXPORT
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Laporan IKM");
-    XLSX.writeFile(wb, `Laporan_IKM_${new Date().toISOString().slice(0,10)}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembinaan");
+    XLSX.writeFile(wb, `Laporan_Pembinaan_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
 function exportToPDF() {
     const reportStats = window.ReportStats;
-    const unsurData = window.UnsurData;
+    const unsurData = window.globalUnsurData || window.UnsurData || window.QuestionsData;
     const respondentsData = window.RespondentsData;
 
     if (!reportStats || !respondentsData || !respondentsData.length) {
@@ -255,36 +264,41 @@ function exportToPDF() {
 
     // 1. Report Header
     doc.setFontSize(16);
-    doc.text("LAPORAN INDEKS KEPUASAN MASYARAKAT (IKM)", 14, 20);
+    doc.setTextColor(234, 88, 12); // Orange-600
+    doc.text("LAPORAN SURVEI PEMBINAAN KEPEGAWAIAN", 14, 20);
     
-    // Get Metadata from DOM elements (UI Inputs)
-    // Support for both IKP and Pembinaan selectors
-    const layananEl = document.querySelector('select[name="layanan_id"] option:checked') || document.querySelector('select[name="unit"] option:checked');
+    // Metadata
+    const unitEl = document.querySelector('select[name="unit"] option:checked');
     const startEl = document.querySelector('input[name="start_date"]');
     const endEl = document.querySelector('input[name="end_date"]');
 
-    const layananText = layananEl ? layananEl.text : '-';
+    const unitText = unitEl ? unitEl.text : '-';
     const periodeText = (startEl && endEl) ? `${startEl.value} s.d ${endEl.value}` : '-';
 
     doc.setFontSize(11);
-    doc.text(`Unit Layanan: ${layananText}`, 14, 28);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Unit Layanan: ${unitText}`, 14, 28);
     doc.text(`Periode: ${periodeText}`, 14, 34);
     doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 40);
 
     // 2. Prepare Table Data
     // Header
     const head = [
-        ["No", "Nama Responden", ...unsurData.map(u => u.kode_unsur || `P${u.id || u.nomor_urut}`), "Tanggal", "Saran"]
+        ["No", "Nama Responden", ...unsurData.map(u => u.kode_unsur || `P${u.id || u.nomor_urut}`), "Tempat/Tanggal", "Metode", "Layanan", "Saran"]
     ];
 
     // Body
     const body = respondentsData.map((row, index) => {
-        const instansi = row.nama_instansi || row.instansi_terpilih || '-';
+        const date = new Date(row.tanggal_pelaksanaan);
+        const dateStr = date.toLocaleDateString('id-ID');
+        
         const rowData = [
             index + 1,
-            row.nama_lengkap.toUpperCase() + `\n(${instansi})`,
+            row.nama_lengkap.toUpperCase() + (row.instansi_terpilih ? `\n(${row.instansi_terpilih})` : ''),
             ...unsurData.map(u => row.scores[u.id] || "-"),
-            new Date(row.tanggal_survei).toLocaleDateString('id-ID'),
+            `${row.tempat_pelaksanaan || '-'}\n${dateStr}`,
+            row.metode_penyampaian || '-',
+            row.unit_kerja_terkait || '-',
             row.saran_masukan || "-"
         ];
         return rowData;
@@ -294,29 +308,29 @@ function exportToPDF() {
     const foot = [];
     
     // Total Row
-    const totalRow = ["", "Jumlah Nilai Per Parameter", ...unsurData.map(u => reportStats.total_per_unsur[u.id]), "", ""];
+    const totalRow = ["", "Jumlah Nilai Per Parameter", ...unsurData.map(u => reportStats.total_per_unsur[u.id]), "", "", "", ""];
     foot.push(totalRow);
 
     // NRR Row
-    const nrrRow = ["", "Nilai Rata-rata (NRR)", ...unsurData.map(u => parseFloat(reportStats.nrr_per_unsur[u.id]).toFixed(2).replace('.',',')), "", ""];
+    const nrrRow = ["", "Nilai Rata-rata (NRR)", ...unsurData.map(u => parseFloat(reportStats.nrr_per_unsur[u.id]).toFixed(2).replace('.',',')), "", "", "", ""];
     foot.push(nrrRow);
 
         // Indeks Row
-    const indeksRow = ["", "Nilai Indeks Per Parameter", ...unsurData.map(u => parseFloat(reportStats.nrr_tertimbang[u.id]).toFixed(2).replace('.',',')), "", ""];
+    const indeksRow = ["", "Nilai Indeks Per Parameter", ...unsurData.map(u => parseFloat(reportStats.nrr_tertimbang[u.id]).toFixed(2).replace('.',',')), "", "", "", ""];
     foot.push(indeksRow);
 
     // IKM Row
-    const ikmRow = ["", "Indeks Kepuasan Masyarakat (IKM)", { content: parseFloat(reportStats.ikm_konversi).toFixed(2).replace('.',','), colSpan: unsurData.length, styles: { halign: 'center', fontStyle: 'bold', fontSize: 12, textColor: [14, 76, 146], fillColor: [239, 246, 255] } }, "", ""];
+    const ikmRow = ["", "Indeks Kepuasan Pembinaan (IKP)", { content: parseFloat(reportStats.ikm_konversi).toFixed(2).replace('.',','), colSpan: unsurData.length, styles: { halign: 'center', fontStyle: 'bold', fontSize: 12, textColor: [154, 52, 18], fillColor: [255, 237, 213] } }, "", "", "", ""];
     foot.push(ikmRow);
     
     // Mutu Row
-    let mutuColor = [255, 255, 255]; // Default white
-    if (reportStats.mutu === 'A') mutuColor = [209, 250, 229]; // Emerald
-    else if (reportStats.mutu === 'B') mutuColor = [219, 234, 254]; // Blue
-    else if (reportStats.mutu === 'C') mutuColor = [254, 249, 195]; // Yellow
-    else if (reportStats.mutu === 'D') mutuColor = [254, 226, 226]; // Red
+    let mutuColor = [255, 255, 255]; 
+    if (reportStats.mutu === 'A') mutuColor = [209, 250, 229]; 
+    else if (reportStats.mutu === 'B') mutuColor = [219, 234, 254]; 
+    else if (reportStats.mutu === 'C') mutuColor = [254, 249, 195]; 
+    else if (reportStats.mutu === 'D') mutuColor = [254, 226, 226]; 
 
-    const mutuRow = ["", "Mutu Pelayanan", { content: `${reportStats.mutu} (${reportStats.ket})`, colSpan: unsurData.length, styles: { halign: 'center', fontStyle: 'bold', fontSize: 12, fillColor: mutuColor } }, "", ""];
+    const mutuRow = ["", "Mutu Pelayanan", { content: `${reportStats.mutu} (${reportStats.ket})`, colSpan: unsurData.length, styles: { halign: 'center', fontStyle: 'bold', fontSize: 12, fillColor: mutuColor } }, "", "", "", ""];
     foot.push(mutuRow);
 
 
@@ -327,18 +341,20 @@ function exportToPDF() {
         body: body,
         foot: foot,
         theme: 'grid',
-        headStyles: { fillColor: [14, 76, 146], textColor: 255, fontStyle: 'bold' }, // Blue Header
+        headStyles: { fillColor: [234, 88, 12], textColor: 255, fontStyle: 'bold' }, // Orange Header
         footStyles: { fillColor: [243, 244, 246], textColor: 0, fontStyle: 'bold' }, // Gray Footer
         styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
         columnStyles: {
             0: { cellWidth: 10, halign: 'center' }, // No
             1: { cellWidth: 40 }, // Nama
             // Dynamic columns for scores handled automatically or defaulting to auto
-            [2 + unsurData.length]: { cellWidth: 25, halign: 'center' }, // Tanggal
-            [2 + unsurData.length + 1]: { cellWidth: 'auto' } // Saran
+            [2 + unsurData.length]: { cellWidth: 25 }, // Tempat/Tanggal
+            [2 + unsurData.length + 1]: { cellWidth: 20 }, // Metode
+            [2 + unsurData.length + 2]: { cellWidth: 25 }, // Layanan
+            [2 + unsurData.length + 3]: { cellWidth: 'auto' } // Saran
         },
         showFoot: 'lastPage' // Show footer only on last page
     });
 
-    doc.save(`Laporan_IKM_${new Date().toISOString().slice(0, 10)}.pdf`);
+    doc.save(`Laporan_Pembinaan_${new Date().toISOString().slice(0, 10)}.pdf`);
 }

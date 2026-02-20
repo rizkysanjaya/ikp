@@ -1,6 +1,50 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+
+<?php 
+// Visual Configuration Map (Key = Kode Layanan)
+// Maps DB Data to UI Elements (Icon, Color, Description) which are not in DB
+$visualConfig = [
+    'KL001' => [
+        'color' => 'blue',
+        'icon' => 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+        'desc' => 'Layanan terkait infrastruktur IT, aplikasi, dan digitalisasi data kepegawaian.'
+    ],
+    'KL002' => [
+        'color' => 'emerald',
+        'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z',
+        'desc' => 'Layanan administrasi pengangkatan CPNS/PNS dan mutasi kepegawaian.'
+    ],
+    'KL003' => [
+        'color' => 'amber',
+        'icon' => 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1',
+        'desc' => 'Layanan terkait status kepegawaian dan proses pemberhentian/pensiun.'
+    ],
+    'KL004' => [
+        'color' => 'purple',
+        'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
+        'desc' => 'Layanan pengembangan kompetensi, kinerja, dan disiplin ASN.'
+    ],
+    'KL005' => [
+        'color' => 'rose',
+        'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+        'desc' => 'Layanan pengawasan norma, standar, prosedur, dan kriteria kepegawaian.'
+    ],
+    'KL006' => [
+        'color' => 'orange',
+        'icon' => 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z',
+        'desc' => 'Layanan penilaian kinerja dan kepuasan terhadap narasumber kegiatan.'
+    ]
+];
+
+// Fallback for new units not in config
+$defaultConfig = [
+    'color' => 'gray', 
+    'icon'  => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    'desc'  => 'Silakan klik untuk memulai survei pada layanan ini.'
+];
+?>
 <!-- Floating Navigation Sidebar -->
 <div x-data="{ activeSection: 'home' }" 
      @scroll.window="
@@ -156,20 +200,68 @@
                 <span class="px-6 py-2 bg-blue-600 text-white font-bold rounded-full group-hover:bg-blue-700 transition-colors relative z-10">Pilih Layanan</span>
             </div>
 
-            <!-- Card 2: Pembinaan Kepegawaian (New/Coming Soon) -->
-            <div class="group cursor-pointer bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 p-8 flex flex-col items-center text-center relative overflow-hidden opacity-75 hover:opacity-100">
-                 <!-- Badge Coming Soon -->
-                 <div class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">Segera Hadir</div>
+            <!-- Card 2: Pembinaan Kepegawaian (Active) -->
+            <div @click="view = 'pembinaan_units'" class="group cursor-pointer bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 p-8 flex flex-col items-center text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-orange-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
-                <div class="w-24 h-24 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div class="w-24 h-24 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative z-10">
                     <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Survei Pembinaan Kepegawaian</h3>
-                <p class="text-gray-500 mb-6">Penilaian khusus terkait bimbingan dan pembinaan kepegawaian.</p>
-                <span class="px-6 py-2 bg-gray-200 text-gray-500 font-bold rounded-full relative z-10 cursor-not-allowed">Belum Tersedia</span>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3 relative z-10">Survei Pembinaan Kepegawaian</h3>
+                <p class="text-gray-500 mb-6 relative z-10">Penilaian khusus terkait bimbingan dan pembinaan kepegawaian.</p>
+                <span class="px-6 py-2 bg-orange-500 text-white font-bold rounded-full group-hover:bg-orange-600 transition-colors relative z-10">Pilih Layanan</span>
             </div>
+        </div>
+    </div>
+
+
+    <!-- PEMBINAAN UNITS SELECTION VIEW -->
+    <div x-show="view === 'pembinaan_units'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
+        
+        <!-- Navigation Back -->
+        <div class="mb-8">
+            <button @click="view = 'category'" class="flex items-center text-orange-600 font-bold hover:underline transition-all">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Pilih Kategori
+            </button>
+        </div>
+
+        <div class="text-center mb-16">
+            <span class="text-orange-600 font-bold tracking-wider uppercase text-sm mb-2 block">Langkah 2</span>
+            <h2 class="text-4xl font-black text-gray-900 mb-6">Area Pembinaan</h2>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-orange-600 to-yellow-500 mx-auto rounded-full"></div>
+            <p class="mt-6 text-gray-600 max-w-2xl mx-auto text-lg">Pilih unit kerja terkait untuk memulai survei pembinaan.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <?php 
+             // Use the SAME units as IKP, but link to Pembinaan
+            foreach($units as $u): 
+                $conf = $visualConfig[$u->kode_layanan] ?? $defaultConfig;
+            ?>
+            <a href="<?= base_url('pembinaan?unit=' . urlencode($u->nama_layanan)) ?>" class="group relative bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-<?= $conf['color'] ?>-500/20 transition-all duration-300 hover:-translate-y-2 overflow-hidden border border-gray-100 p-8 flex flex-col items-start z-10">
+                <!-- Glow Background on Hover -->
+                <div class="absolute inset-0 bg-gradient-to-br from-<?= $conf['color'] ?>-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="w-16 h-16 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-<?= $conf['color'] ?>-500 mb-6 group-hover:scale-110 group-hover:bg-<?= $conf['color'] ?>-500 group-hover:text-white transition-all duration-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $conf['icon'] ?>"></path>
+                    </svg>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-<?= $conf['color'] ?>-600 transition-colors"><?= esc($u->nama_layanan) ?></h3>
+                <p class="text-sm text-gray-500 leading-relaxed mb-6 flex-grow"><?= $conf['desc'] ?></p>
+                
+                <div class="inline-flex items-center text-sm font-bold text-<?= $conf['color'] ?>-600 uppercase tracking-wide mt-auto">
+                    Mulai Survei
+                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </div>
+            </a>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -196,47 +288,7 @@
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <!-- Unit Template Helper -->
             <?php 
-            // Visual Configuration Map (Key = Kode Layanan)
-            // Maps DB Data to UI Elements (Icon, Color, Description) which are not in DB
-            $visualConfig = [
-                'KL001' => [
-                    'color' => 'blue',
-                    'icon' => 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-                    'desc' => 'Layanan terkait infrastruktur IT, aplikasi, dan digitalisasi data kepegawaian.'
-                ],
-                'KL002' => [
-                    'color' => 'emerald',
-                    'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z',
-                    'desc' => 'Layanan administrasi pengangkatan CPNS/PNS dan mutasi kepegawaian.'
-                ],
-                'KL003' => [
-                    'color' => 'amber',
-                    'icon' => 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1',
-                    'desc' => 'Layanan terkait status kepegawaian dan proses pemberhentian/pensiun.'
-                ],
-                'KL004' => [
-                    'color' => 'purple',
-                    'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-                    'desc' => 'Layanan pengembangan kompetensi, kinerja, dan disiplin ASN.'
-                ],
-                'KL005' => [
-                    'color' => 'rose',
-                    'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-                    'desc' => 'Layanan pengawasan norma, standar, prosedur, dan kriteria kepegawaian.'
-                ],
-                'KL006' => [
-                    'color' => 'orange',
-                    'icon' => 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z',
-                    'desc' => 'Layanan penilaian kinerja dan kepuasan terhadap narasumber kegiatan.'
-                ]
-            ];
-            
-            // Fallback for new units not in config
-            $defaultConfig = [
-                'color' => 'gray', 
-                'icon'  => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                'desc'  => 'Silakan klik untuk memulai survei pada layanan ini.'
-            ];
+            // Config moved to top of file
             ?>
 
             <?php foreach($units as $u): 
@@ -353,7 +405,6 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php 
-                // Decode data for loop
                 $units = json_decode($gridUnitData, true);
                 if (!empty($units)):
                     foreach($units as $index => $u):
